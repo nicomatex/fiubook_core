@@ -14,7 +14,8 @@ build-image: transpile
 .PHONY: build-image
 
 push: build-image
-	docker tag fiubook_core:latest nicomatex/fiubook_core:latest && docker push nicomatex/fiubook_core:latest
+	docker tag fiubook_core:latest nicomatex/fiubook_core:latest
+	docker push nicomatex/fiubook_core:latest
 .PHONY: push
 
 bootstrap_cluster:
@@ -25,3 +26,11 @@ bootstrap_cluster:
 	@echo "Deploying core service"
 	kubectl apply -f ./kube_templates/core-deployment.yml
 .PHONY: bootstrap_cluster
+
+logs:
+	kubectl logs -f -l app=fiubook-core
+.PHONY: logs
+
+reload: push
+	kubectl rollout restart deployment fiubook-core-deployment
+.PHONY: reload
