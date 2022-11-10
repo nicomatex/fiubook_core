@@ -16,3 +16,12 @@ build-image: transpile
 push: build-image
 	docker tag fiubook_core:latest nicomatex/fiubook_core:latest && docker push nicomatex/fiubook_core:latest
 .PHONY: push
+
+bootstrap_cluster:
+	@echo "Creating physical volume for database"
+	kubectl apply -f ./kube_templates/db-pv.yml
+	@echo "Deploying database"
+	kubectl apply -f ./kube_templates/core-db.yml
+	@echo "Deploying core service"
+	kubectl apply -f ./kube_templates/core-deployment.yml
+.PHONY: bootstrap_cluster
