@@ -1,41 +1,41 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: core-lb
+    name: core-lb
 spec:
-  selector:
-    app: fiubook-core
-  ports:
-    - protocol: TCP
-      port: 3000
-      targetPort: 3000
-  type: LoadBalancer
+    selector:
+        app: fiubook-core
+    ports:
+        - protocol: TCP
+          port: 3000
+          targetPort: 3000
+    type: LoadBalancer
 ---
 apiVersion: apps/v1
-kind: Deployment 
+kind: Deployment
 metadata:
-  name: fiubook-core-deployment
-  labels:
-    app: fiubook-core
-spec:
-  replicas: 1
-  selector: 
-    matchLabels:
-      app: fiubook-core
-  template:
-    metadata:
-      labels:
+    name: fiubook-core-deployment
+    labels:
         app: fiubook-core
-    spec:
-      containers:
-      - name: core-container
-        image: nicomatex/fiubook_core:latest
-        ports:
-          - containerPort: 3000
-            name: http
-        resources:
-          requests:
-            ephemeral-storage: "1Gi"
-          limits:
-            ephemeral-storage: "1Gi"
-        imagePullPolicy: "Always"
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: fiubook-core
+    template:
+        metadata:
+            labels:
+                app: fiubook-core
+        spec:
+            containers:
+                - name: core-container
+                  image: nicomatex/fiubook_core:latest
+                  ports:
+                      - containerPort: 3000
+                        name: http
+                  resources:
+                      requests:
+                          ephemeral-storage: '1Gi'
+                      limits:
+                          ephemeral-storage: '1Gi'
+                  imagePullPolicy: 'Always'
