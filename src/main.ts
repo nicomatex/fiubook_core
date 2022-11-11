@@ -1,7 +1,9 @@
+import 'reflect-metadata'
 import express from 'express'
 import knex from 'knex'
-import axios from 'axios'
 import config from '@config/development'
+import { schema } from '@graphql/schema'
+import { graphqlHTTP } from 'express-graphql'
 
 const app = express()
 
@@ -12,18 +14,20 @@ const knex_connection = knex({
 })
 
 app.get('/', async (req, res) => {
-    const user_data = {
-        id: 'f40b876d-27ef-456d-925a-6ae5c10cefef',
-        email: 'yhuang@fi.uba.ar',
-        roles: ['STUDENT', 'PROFESSOR'],
-    }
-    try {
-        const insertion = await knex_connection('users').insert(user_data)
-        res.status(200).send('Inserted successfully')
-    } catch (e) {
-        res.status(200).send(`Error ${e}`)
-    }
+    res.status(200).send('Hola mundo')
 })
+
+const apply_schema = async () => {
+    app.use(
+        '/graph',
+        graphqlHTTP({
+            schema: await schema,
+            graphiql: true,
+        })
+    )
+}
+
+apply_schema()
 
 app.listen(3000, () => {
     console.log('App listening on 3000')
