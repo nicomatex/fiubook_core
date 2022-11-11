@@ -5,7 +5,7 @@ metadata:
     labels:
         app: postgres-db
 data:
-    POSTGRES_DB: fiubook_core_db
+    POSTGRES_DB: postgres
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: pistacho
     PGDATA: /data/pgdata

@@ -22,8 +22,12 @@ push: build-image
 bootstrap_cluster:
 	@echo "Creating physical volume for database"
 	kubectl apply -f ./kube_templates/db-pv.yml
+	@echo "Creating database config"
+	kubectl apply -f ./kube_templates/postgres-config.yml
 	@echo "Deploying database"
 	kubectl apply -f ./kube_templates/core-db.yml
+	@echo "Creating core service config"
+	kubectl apply -f ./kube_templates/core-config.yml
 	@echo "Deploying core service"
 	kubectl apply -f ./kube_templates/core-deployment.yml
 .PHONY: bootstrap_cluster

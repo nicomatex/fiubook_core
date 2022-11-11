@@ -7,7 +7,6 @@ metadata:
 data:
     DATABASE_HOST: postgres-db-internal
     DATABASE_PORT: '5432'
-    DATABASE_USER: postgres
+    DATABASE_USER: sysuser
     DATABASE_PASSWORD: pistacho
     DATABASE_NAME: fiubook-core-db
-    PGDATA: /data/pgdata
