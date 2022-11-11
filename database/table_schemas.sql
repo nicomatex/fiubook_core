@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS services(
         min_time INTEGER NOT NULL DEFAULT '1',
         max_time INTEGER,
         booking_type BOOKING_TYPE,
-        allowed_roles INTEGER[]
+        allowed_roles UNIVERSITY_ROLE[]
 );
 
 CREATE TABLE IF NOT EXISTS users(
