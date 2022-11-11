@@ -7,12 +7,6 @@ import { graphqlHTTP } from 'express-graphql'
 
 const app = express()
 
-const port = parseInt(process.env.database_port ?? '0')
-
-const knex_connection = knex({
-    ...config.knex,
-})
-
 app.get('/', async (req, res) => {
     res.status(200).send('Hola mundo')
 })
@@ -31,5 +25,4 @@ apply_schema()
 
 app.listen(3000, () => {
     console.log('App listening on 3000')
-    console.log(knex_connection.client.connectionSettings)
 })

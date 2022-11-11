@@ -7,8 +7,10 @@ import {
     Query,
     Resolver,
 } from 'type-graphql'
+
 import { User } from '@graphql/schemas/user'
 import { MaxLength, Length, ArrayMaxSize } from 'class-validator'
+import userRepository from '@repositories/userRepository'
 
 @InputType()
 class NewUserInput {
@@ -26,26 +28,34 @@ class UserResolver {
     constructor() {}
 
     @Query((returns) => User)
-    user(
-        @Arg('id', { nullable: true }) id?: string,
+    async user(
+        // @Arg('id', { nullable: true }) id?: string,
         @Arg('email', { nullable: true }) email?: string
     ) {
-        return {
-            id: '89c526d6-7626-4656-a521-d030c1e745e2',
-            email: 'naguerre@fi.uba.ar',
-            roles: ['STUDENT'],
+        if (email !== undefined) {
+            const res = await userRepository.getUserByEmail(email)
+            console.log(res)
+            return res
         }
     }
 
     @Mutation((returns) => User)
     // @Authorized()
-    addUser(@Arg('newUserData') newUserData: NewUserInput): Promise<User> {
-        console.log(newUserData)
-        return Promise.resolve({
-            id: '89c526d6-7626-4656-a521-d030c1e745e2',
-            email: 'naguerre@fi.uba.ar',
-            roles: ['STUDENT'],
-        })
+    async addUser(
+        @Arg('newUserData') newUserData: NewUserInput
+    ): Promise<User> {
+        try {
+            const res = await userRepository.addUser(
+                newUserData.email,
+                newUserData.roles
+            )
+            return res
+        } catch (err: any) {
+            if (err.code === '23505') {
+                throw new Error('Email already in use')
+            }
+            throw err
+        }
     }
 }
 
