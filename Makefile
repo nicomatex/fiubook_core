@@ -7,6 +7,7 @@ all:
 
 transpile:
 	npx tsc
+	npx tsc-alias
 .PHONY: transpile
 
 build-image: transpile 

@@ -1,4 +1,4 @@
-const port = parseInt(process.env.database_port ?? '0')
+const port = parseInt(process.env.DATABASE_PORT ?? '0')
 
 const config = {
     knex: {

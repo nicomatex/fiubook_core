@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: core-config
+    labels:
+        app: fiubook-core
+data:
+    DATABASE_HOST: postgres-db-internal
+    DATABASE_PORT: '5432'
+    DATABASE_USER: postgres
+    DATABASE_PASSWORD: pistacho
+    DATABASE_NAME: fiubook-core-db
+    PGDATA: /data/pgdata

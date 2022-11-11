@@ -39,3 +39,6 @@ spec:
                       limits:
                           ephemeral-storage: '1Gi'
                   imagePullPolicy: 'Always'
+                  envFrom:
+                      - configMapRef:
+                            name: core-config

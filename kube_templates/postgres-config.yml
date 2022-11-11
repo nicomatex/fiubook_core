@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: postgres-config
+    labels:
+        app: postgres-db
+data:
+    POSTGRES_DB: fiubook_core_db
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: pistacho
+    PGDATA: /data/pgdata
