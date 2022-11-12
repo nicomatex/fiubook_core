@@ -29,14 +29,18 @@ class UserResolver {
 
     @Query((returns) => User)
     async user(
-        // @Arg('id', { nullable: true }) id?: string,
+        @Arg('id', { nullable: true }) id?: string,
         @Arg('email', { nullable: true }) email?: string
     ) {
         if (email !== undefined) {
             const res = await userRepository.getUserByEmail(email)
-            console.log(res)
             return res
         }
+        if (id !== undefined) {
+            const res = await userRepository.getUserById(id)
+            return res
+        }
+        throw new Error('You must specify either email or id')
     }
 
     @Mutation((returns) => User)

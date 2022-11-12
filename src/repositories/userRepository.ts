@@ -28,4 +28,15 @@ const getUserByEmail = async (email: string): Promise<User> => {
     return user
 }
 
-export default { addUser, getUserByEmail }
+const getUserById = async (id: string): Promise<User> => {
+    const res = await connection('users').where({ id })
+    if (res.length === 0) throw new Error(`User with id ${id} not found`)
+    const user = res[0]
+
+    // Parse postgres array into JS array
+    user.roles = parse(user.roles)
+
+    return user
+}
+
+export default { addUser, getUserByEmail, getUserById }
