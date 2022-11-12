@@ -1,8 +1,11 @@
 import config from '@config/development'
-import { User } from '@graphql/schemas/user'
+import { PaginatedUserResponse, User } from '@graphql/schemas/user'
 import knex from 'knex'
 import { v4 as uuidv4 } from 'uuid'
 import { parse } from 'postgres-array'
+import { genPaginationToken } from '@util/dbUtil'
+import { PaginatedQueryType } from '@util/dbUtil'
+import type { PaginatedQueryResult } from '@repositories/types'
 
 const connection = knex({ ...config.knex })
 
@@ -13,8 +16,11 @@ const addUser = async (email: string, roles: string[]): Promise<User> => {
         email,
         roles,
     }
-    await connection('users').insert(newUser)
-    return newUser
+    const insertionResult = await connection('users')
+        .insert(newUser)
+        .returning('*')
+    const insertedUser = insertionResult[0]
+    return insertedUser
 }
 
 const getUserByEmail = async (email: string): Promise<User> => {
@@ -39,4 +45,29 @@ const getUserById = async (id: string): Promise<User> => {
     return user
 }
 
-export default { addUser, getUserByEmail, getUserById }
+const getUsers = async (
+    paginationToken?: string
+): Promise<PaginatedUserResponse> => {
+    if (paginationToken !== undefined) {
+    }
+    const data = await connection('users')
+        .orderBy('ts')
+        .orderBy('id')
+        .limit(config.pagination.pageSize)
+
+    if (data.length === config.pagination.pageSize) {
+        const lastRecord = data[data.length - 1] as User
+        const newPaginationToken = genPaginationToken(
+            lastRecord.id,
+            lastRecord.ts,
+            PaginatedQueryType.Users
+        )
+        return {
+            items: data,
+            paginationToken: newPaginationToken,
+        }
+    }
+    return { items: data }
+}
+
+export default { addUser, getUserByEmail, getUserById, getUsers }

@@ -1,15 +1,18 @@
 import {
     Arg,
+    Args,
+    ArgsType,
     Authorized,
     Field,
     InputType,
+    Int,
     Mutation,
     Query,
     Resolver,
 } from 'type-graphql'
 
-import { User } from '@graphql/schemas/user'
-import { MaxLength, Length, ArrayMaxSize } from 'class-validator'
+import { PaginatedUserResponse, User } from '@graphql/schemas/user'
+import { MaxLength, ArrayMaxSize, Min } from 'class-validator'
 import userRepository from '@repositories/userRepository'
 
 @InputType()
@@ -21,6 +24,13 @@ class NewUserInput {
     @Field((type) => [String])
     @ArrayMaxSize(3)
     roles!: string[]
+}
+
+@ArgsType()
+class UsersArgs {
+    @Field((type) => Int)
+    @Min(0)
+    cursor: number = 0
 }
 
 @Resolver(User)
@@ -41,6 +51,17 @@ class UserResolver {
             return res
         }
         throw new Error('You must specify either email or id')
+    }
+
+    @Query((returns) => PaginatedUserResponse)
+    async users(@Args() { cursor }: UsersArgs) {
+        try {
+            const res = await userRepository.getUsers()
+            return res
+        } catch (e) {
+            console.log(e)
+            throw e
+        }
     }
 
     @Mutation((returns) => User)

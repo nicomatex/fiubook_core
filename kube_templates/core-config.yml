@@ -10,3 +10,5 @@ data:
     DATABASE_USER: sysuser
     DATABASE_PASSWORD: pistacho
     DATABASE_NAME: fiubook-core-db
+    PAGINATION_SECRET: yerbamate
+    PAGE_SIZE: '1'
