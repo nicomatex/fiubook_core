@@ -7,6 +7,12 @@ enum PaginatedQueryType {
     Bookings,
 }
 
+type PaginationTokenPayload = {
+    id: string
+    ts: string
+    type: PaginatedQueryType
+}
+
 const genPaginationToken = (
     id: string,
     ts: string,
@@ -23,4 +29,18 @@ const genPaginationToken = (
     return token
 }
 
-export { genPaginationToken, PaginatedQueryType }
+const decodePaginationToken = (
+    token: string,
+    expectedType: PaginatedQueryType
+): PaginationTokenPayload => {
+    const data = jwt.verify(
+        token,
+        config.pagination.secret
+    ) as PaginationTokenPayload
+    if (data.type !== expectedType) {
+        throw new Error('Pagination token type is not valid for this query')
+    }
+    return data
+}
+
+export { genPaginationToken, decodePaginationToken, PaginatedQueryType }

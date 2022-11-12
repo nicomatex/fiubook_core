@@ -3,7 +3,7 @@ CREATE TYPE UNIVERSITY_ROLE AS ENUM ('PROFESSOR','STUDENT','NODO');
 
 CREATE TABLE IF NOT EXISTS services(
         id CHAR(36) PRIMARY KEY,
-        ts TIMESTAMPTZ DEFAULT current_timestamp,
+        ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
         name VARCHAR(128) NOT NULL,
         description VARCHAR(512),
         granularity INTERVAL,
@@ -18,7 +18,7 @@ CREATE INDEX ts_idx_services ON services USING btree (ts);
 
 CREATE TABLE IF NOT EXISTS users(
     id CHAR(36) PRIMARY KEY,
-    ts TIMESTAMPTZ DEFAULT current_timestamp,
+    ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
     email VARCHAR(128) NOT NULL UNIQUE,
     roles UNIVERSITY_ROLE[] NOT NULL
 );
@@ -28,7 +28,7 @@ CREATE INDEX ts_idx_users ON users USING btree (ts);
 
 CREATE TABLE IF NOT EXISTS bookings(
     id CHAR(36) PRIMARY KEY,
-    ts TIMESTAMPTZ DEFAULT current_timestamp,
+    ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
     service_id CHAR(36) REFERENCES services(id),
     requestor_id CHAR(36) REFERENCES users(id),
     publisher_id CHAR(36) REFERENCES users(id),

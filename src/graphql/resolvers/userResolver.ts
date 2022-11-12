@@ -28,9 +28,8 @@ class NewUserInput {
 
 @ArgsType()
 class UsersArgs {
-    @Field((type) => Int)
-    @Min(0)
-    cursor: number = 0
+    @Field()
+    paginationToken?: string
 }
 
 @Resolver(User)
@@ -54,9 +53,9 @@ class UserResolver {
     }
 
     @Query((returns) => PaginatedUserResponse)
-    async users(@Args() { cursor }: UsersArgs) {
+    async users(@Args() { paginationToken }: UsersArgs) {
         try {
-            const res = await userRepository.getUsers()
+            const res = await userRepository.getUsers(paginationToken)
             return res
         } catch (e) {
             console.log(e)

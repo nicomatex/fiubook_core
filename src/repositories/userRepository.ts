@@ -25,12 +25,13 @@ const addUser = async (email: string, roles: string[]): Promise<User> => {
 
 const getUserByEmail = async (email: string): Promise<User> => {
     const res = await connection('users').where({ email })
+    console.log(res)
     if (res.length === 0) throw new Error(`User with email ${email} not found`)
     const user = res[0]
 
     // Parse postgres array into JS array
     user.roles = parse(user.roles)
-
+    user.ts = user.ts.toISOString()
     return user
 }
 
