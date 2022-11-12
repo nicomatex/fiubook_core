@@ -28,7 +28,7 @@ class NewUserInput {
 
 @ArgsType()
 class UsersArgs {
-    @Field()
+    @Field({ nullable: true })
     paginationToken?: string
 }
 

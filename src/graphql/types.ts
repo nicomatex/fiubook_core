@@ -9,7 +9,7 @@ function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
         // and here the generic type
         items!: TItem[]
 
-        @Field()
+        @Field({ nullable: true })
         paginationToken?: string
     }
     return PaginatedResponseClass

@@ -3,9 +3,10 @@ import { PaginatedUserResponse, User } from '@graphql/schemas/user'
 import knex from 'knex'
 import { v4 as uuidv4 } from 'uuid'
 import { parse } from 'postgres-array'
-import { genPaginationToken } from '@util/dbUtil'
+import { decodePaginationToken, genPaginationToken } from '@util/dbUtil'
 import { PaginatedQueryType } from '@util/dbUtil'
 import type { PaginatedQueryResult } from '@repositories/types'
+import { ID } from 'type-graphql'
 
 const connection = knex({ ...config.knex })
 
@@ -49,12 +50,29 @@ const getUserById = async (id: string): Promise<User> => {
 const getUsers = async (
     paginationToken?: string
 ): Promise<PaginatedUserResponse> => {
+    let data
     if (paginationToken !== undefined) {
+        const { id: previous_page_last_id, ts: previous_page_last_ts } =
+            decodePaginationToken(paginationToken, PaginatedQueryType.Users)
+
+        data = await connection('users')
+            // Keyset Pagination condition
+            .whereRaw(
+                `(ts, id) > ('${previous_page_last_ts}','${previous_page_last_id}')`
+            )
+            .orderBy('ts')
+            .orderBy('id')
+            .limit(config.pagination.pageSize)
+    } else {
+        data = await connection('users')
+            .orderBy('ts')
+            .orderBy('id')
+            .limit(config.pagination.pageSize)
     }
-    const data = await connection('users')
-        .orderBy('ts')
-        .orderBy('id')
-        .limit(config.pagination.pageSize)
+
+    data.forEach((user) => {
+        user.roles = parse(user.roles)
+    })
 
     if (data.length === config.pagination.pageSize) {
         const lastRecord = data[data.length - 1] as User
