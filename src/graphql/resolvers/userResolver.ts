@@ -18,17 +18,6 @@ import userRepository from '@repositories/userRepository'
 import CheckFiubaCredentialsMiddleware from '@graphql/middlewares/checkFIUBACredentialsMiddleware'
 import { Credentials } from '@graphql/types'
 
-@InputType()
-class NewUserInput {
-    @Field()
-    @MaxLength(128)
-    dni!: string
-
-    @Field((type) => [String])
-    @ArrayMaxSize(3)
-    roles!: string[]
-}
-
 @ArgsType()
 class UsersArgs {
     @Field({ nullable: true })
