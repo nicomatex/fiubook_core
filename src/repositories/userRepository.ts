@@ -5,29 +5,31 @@ import { v4 as uuidv4 } from 'uuid'
 import { parse } from 'postgres-array'
 import { decodePaginationToken, genPaginationToken } from '@util/dbUtil'
 import { PaginatedQueryType } from '@util/dbUtil'
-import type { PaginatedQueryResult } from '@repositories/types'
-import { ID } from 'type-graphql'
 
 const connection = knex({ ...config.knex })
 
-const addUser = async (email: string, roles: string[]): Promise<User> => {
+const defaultRoles = ['STUDENT']
+
+const addUser = async (dni: string): Promise<User> => {
     const id = uuidv4()
     const newUser = {
         id,
-        email,
-        roles,
+        dni,
+        roles: defaultRoles,
     }
     const insertionResult = await connection('users')
         .insert(newUser)
         .returning('*')
     const insertedUser = insertionResult[0]
+
+    insertedUser.roles = parse(insertedUser.roles)
     return insertedUser
 }
 
-const getUserByEmail = async (email: string): Promise<User> => {
-    const res = await connection('users').where({ email })
+const getUserByDNI = async (dni: string): Promise<User> => {
+    const res = await connection('users').where({ dni })
     console.log(res)
-    if (res.length === 0) throw new Error(`User with email ${email} not found`)
+    if (res.length === 0) throw new Error(`User with DNI ${dni} not found`)
     const user = res[0]
 
     // Parse postgres array into JS array
@@ -89,4 +91,4 @@ const getUsers = async (
     return { items: data }
 }
 
-export default { addUser, getUserByEmail, getUserById, getUsers }
+export default { addUser, getUserByDNI, getUserById, getUsers }

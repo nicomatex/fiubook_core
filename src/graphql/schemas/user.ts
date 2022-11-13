@@ -10,7 +10,7 @@ class User {
     ts!: string
 
     @Field()
-    email!: string
+    dni!: string
 
     @Field((type) => [String])
     roles!: string[]

@@ -1,4 +1,5 @@
-import { ClassType, Field, ObjectType } from 'type-graphql'
+import { MaxLength } from 'class-validator'
+import { ClassType, Field, InputType, ObjectType } from 'type-graphql'
 
 function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
@@ -19,4 +20,15 @@ type ContextType = {
     token: String
 }
 
-export { PaginatedResponse, ContextType }
+@InputType()
+class Credentials {
+    @Field()
+    @MaxLength(128)
+    dni!: string
+
+    @Field()
+    @MaxLength(128)
+    password!: string
+}
+
+export { PaginatedResponse, ContextType, Credentials }

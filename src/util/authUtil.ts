@@ -16,11 +16,11 @@ const createSessionToken = (user: User): string => {
 }
 
 //TODO: unmock this implementation
-const checkFiubaCredentials = async (
+const checkFIUBACredentials = async (
     dni: string,
     password: string
 ): Promise<boolean> => {
     return true
 }
 
-export { createSessionToken, checkFiubaCredentials }
+export { createSessionToken, checkFIUBACredentials }

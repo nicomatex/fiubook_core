@@ -9,17 +9,20 @@ import {
     Mutation,
     Query,
     Resolver,
+    UseMiddleware,
 } from 'type-graphql'
 
 import { PaginatedUserResponse, User } from '@graphql/schemas/user'
 import { MaxLength, ArrayMaxSize, Min } from 'class-validator'
 import userRepository from '@repositories/userRepository'
+import CheckFiubaCredentialsMiddleware from '@graphql/middlewares/checkFIUBACredentialsMiddleware'
+import { Credentials } from '@graphql/types'
 
 @InputType()
 class NewUserInput {
     @Field()
     @MaxLength(128)
-    email!: string
+    dni!: string
 
     @Field((type) => [String])
     @ArrayMaxSize(3)
@@ -39,17 +42,17 @@ class UserResolver {
     @Query((returns) => User)
     async user(
         @Arg('id', { nullable: true }) id?: string,
-        @Arg('email', { nullable: true }) email?: string
+        @Arg('dni', { nullable: true }) dni?: string
     ) {
-        if (email !== undefined) {
-            const res = await userRepository.getUserByEmail(email)
+        if (dni !== undefined) {
+            const res = await userRepository.getUserByDNI(dni)
             return res
         }
         if (id !== undefined) {
             const res = await userRepository.getUserById(id)
             return res
         }
-        throw new Error('You must specify either email or id')
+        throw new Error('You must specify either DNI or id')
     }
 
     @Query((returns) => PaginatedUserResponse)
@@ -65,18 +68,14 @@ class UserResolver {
     }
 
     @Mutation((returns) => User)
-    async addUser(
-        @Arg('newUserData') newUserData: NewUserInput
-    ): Promise<User> {
+    @UseMiddleware(CheckFiubaCredentialsMiddleware)
+    async addUser(@Arg('credentials') credentials: Credentials): Promise<User> {
         try {
-            const res = await userRepository.addUser(
-                newUserData.email,
-                newUserData.roles
-            )
+            const res = await userRepository.addUser(credentials.dni)
             return res
         } catch (err: any) {
             if (err.code === '23505') {
-                throw new Error('Email already in use')
+                throw new Error('DNI already in use')
             }
             throw err
         }
