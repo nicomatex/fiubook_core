@@ -15,4 +15,8 @@ function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     return PaginatedResponseClass
 }
 
-export { PaginatedResponse }
+type ContextType = {
+    token: String
+}
+
+export { PaginatedResponse, ContextType }

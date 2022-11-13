@@ -33,7 +33,7 @@ bootstrap_cluster:
 .PHONY: bootstrap_cluster
 
 logs:
-	kubectl logs -f -l app=fiubook-core
+	kubectl logs -f -l app=fiubook-core --follow
 .PHONY: logs
 
 reload: push

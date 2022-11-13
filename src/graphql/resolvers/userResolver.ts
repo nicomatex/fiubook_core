@@ -53,6 +53,7 @@ class UserResolver {
     }
 
     @Query((returns) => PaginatedUserResponse)
+    @Authorized(['ADMIN'])
     async users(@Args() { paginationToken }: UsersArgs) {
         try {
             const res = await userRepository.getUsers(paginationToken)
@@ -64,7 +65,6 @@ class UserResolver {
     }
 
     @Mutation((returns) => User)
-    // @Authorized()
     async addUser(
         @Arg('newUserData') newUserData: NewUserInput
     ): Promise<User> {

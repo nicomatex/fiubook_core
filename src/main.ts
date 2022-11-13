@@ -11,17 +11,28 @@ app.get('/', async (req, res) => {
     res.status(200).send('Hola mundo')
 })
 
-const apply_schema = async () => {
-    app.use(
-        '/graph',
-        graphqlHTTP({
-            schema: await schema,
-            graphiql: true,
-        })
-    )
-}
+app.use(
+    '/graph',
+    graphqlHTTP(async (req) => {
+        const { authorization } = req.headers
 
-apply_schema()
+        // if (!authorization) {
+        //     throw new Error('Unauthorized')
+        // }
+
+        const secret = 'Falopa'
+
+        return {
+            schema: await schema,
+            graphiql: {
+                headerEditorEnabled: true,
+            },
+            context: {
+                secret,
+            },
+        }
+    })
+)
 
 app.listen(3000, () => {
     console.log('App listening on 3000')
