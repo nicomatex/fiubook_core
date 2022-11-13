@@ -1,4 +1,4 @@
-import config from '@config/development'
+import config from '@config/default'
 import { PaginatedUserResponse, User } from '@graphql/schemas/user'
 import knex from 'knex'
 import { v4 as uuidv4 } from 'uuid'

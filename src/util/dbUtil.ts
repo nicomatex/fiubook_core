@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import config from '@config/development'
+import config from '@config/default'
 
 enum PaginatedQueryType {
     Users,

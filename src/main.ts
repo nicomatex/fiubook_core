@@ -1,7 +1,5 @@
 import 'reflect-metadata'
 import express from 'express'
-import knex from 'knex'
-import config from '@config/development'
 import { schema } from '@graphql/schema'
 import { graphqlHTTP } from 'express-graphql'
 
