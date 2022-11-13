@@ -16,9 +16,15 @@ function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     return PaginatedResponseClass
 }
 
-type ContextType = {
-    token: String
-}
+type ContextType =
+    | {
+          isLoggedIn: true
+          userId: string
+          roles: string[]
+      }
+    | {
+          isLoggedIn: false
+      }
 
 @InputType()
 class Credentials {

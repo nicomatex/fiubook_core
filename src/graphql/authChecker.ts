@@ -6,7 +6,6 @@ export const authChecker: AuthChecker<ContextType> = (
     roles
 ) => {
     console.log(context)
-    console.log(roles)
     return true
 }
 

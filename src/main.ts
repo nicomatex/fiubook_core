@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import express from 'express'
 import { schema } from '@graphql/schema'
 import { graphqlHTTP } from 'express-graphql'
-
+import { buildContext } from '@util/contextUtil'
 const app = express()
 
 app.get('/', async (req, res) => {
@@ -12,22 +12,13 @@ app.get('/', async (req, res) => {
 app.use(
     '/graph',
     graphqlHTTP(async (req) => {
-        const { authorization } = req.headers
-
-        // if (!authorization) {
-        //     throw new Error('Unauthorized')
-        // }
-
-        const secret = 'Falopa'
-
+        const context = buildContext(req.headers)
         return {
             schema: await schema,
             graphiql: {
                 headerEditorEnabled: true,
             },
-            context: {
-                secret,
-            },
+            context,
         }
     })
 )
