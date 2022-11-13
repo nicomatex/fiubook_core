@@ -31,7 +31,7 @@ class SessionResolver {
         )
         if (!isFiubaUser) {
             // TODO mejorar este error
-            throw new Error("You're not a FIUBA user")
+            throw new Error("You're not a FIUBA user or the password is wrong")
         }
 
         return {
