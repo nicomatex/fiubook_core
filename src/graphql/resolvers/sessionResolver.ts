@@ -1,16 +1,10 @@
-import {
-    Arg,
-    Field,
-    InputType,
-    Mutation,
-    Resolver,
-    UseMiddleware,
-} from 'type-graphql'
+import { Arg, Mutation, Resolver, UseMiddleware } from 'type-graphql'
 
-import { MaxLength } from 'class-validator'
 import { Session } from '@graphql/schemas/session'
 import CheckFiubaCredentialsMiddleware from '@graphql/middlewares/checkFIUBACredentialsMiddleware'
 import { Credentials } from '@graphql/types'
+import userRepository from '@repositories/userRepository'
+import { createSessionToken } from '@util/authUtil'
 
 @Resolver(Session)
 class SessionResolver {
@@ -21,8 +15,10 @@ class SessionResolver {
     async createSession(
         @Arg('credentials') credentials: Credentials
     ): Promise<Session> {
+        const user = await userRepository.getUserByDNI(credentials.dni)
+        const token = createSessionToken(user)
         return {
-            token: 'falopa-123-456',
+            token,
         }
     }
 }
