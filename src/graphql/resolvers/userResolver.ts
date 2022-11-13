@@ -4,8 +4,6 @@ import {
     ArgsType,
     Authorized,
     Field,
-    InputType,
-    Int,
     Mutation,
     Query,
     Resolver,
@@ -13,7 +11,6 @@ import {
 } from 'type-graphql'
 
 import { PaginatedUserResponse, User } from '@graphql/schemas/user'
-import { MaxLength, ArrayMaxSize, Min } from 'class-validator'
 import userRepository from '@repositories/userRepository'
 import CheckFiubaCredentialsMiddleware from '@graphql/middlewares/checkFIUBACredentialsMiddleware'
 import { Credentials } from '@graphql/types'
