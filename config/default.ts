@@ -17,6 +17,11 @@ const config = {
         secret: process.env.PAGINATION_SECRET || 'yerbamate',
         pageSize: pageSize,
     },
+
+    session: {
+        secret: process.env.SESSION_SECRET || 'playadito',
+        sessionDuration: process.env.SESSION_DEFAULT_DURATION || '7 days',
+    },
 }
 
 export default config
