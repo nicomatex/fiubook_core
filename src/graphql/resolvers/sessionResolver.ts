@@ -3,12 +3,13 @@ import { Arg, Field, InputType, Mutation, Resolver } from 'type-graphql'
 import { MaxLength } from 'class-validator'
 import { Session } from '@graphql/schemas/session'
 import userRepository from '@repositories/userRepository'
+import { checkFiubaCredentials } from '@util/authUtil'
 
 @InputType()
 class Credentials {
     @Field()
     @MaxLength(128)
-    email!: string
+    dni!: string
 
     @Field()
     @MaxLength(128)
@@ -23,7 +24,15 @@ class SessionResolver {
     async createSession(
         @Arg('credentials') credentials: Credentials
     ): Promise<Session> {
-        const user = userRepository.getUserByEmail(credentials.email)
+        // Check fiuba credentials first
+        const isFiubaUser = await checkFiubaCredentials(
+            credentials.dni,
+            credentials.password
+        )
+        if (!isFiubaUser) {
+            // TODO mejorar este error
+            throw new Error("You're not a FIUBA user")
+        }
 
         return {
             token: 'falopa-123-456',

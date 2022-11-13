@@ -15,4 +15,12 @@ const createSessionToken = (user: User): string => {
     return token
 }
 
-export { createSessionToken }
+//TODO: unmock this implementation
+const checkFiubaCredentials = async (
+    dni: string,
+    password: string
+): Promise<boolean> => {
+    return true
+}
+
+export { createSessionToken, checkFiubaCredentials }
