@@ -1,5 +1,11 @@
 import { MaxLength } from 'class-validator'
-import { ClassType, Field, InputType, ObjectType } from 'type-graphql'
+import {
+    ClassType,
+    Field,
+    InputType,
+    ObjectType,
+    ResolverData,
+} from 'type-graphql'
 
 function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
@@ -26,6 +32,13 @@ type ContextType =
           isLoggedIn: false
       }
 
+type RoleChecker = ({
+    root,
+    args,
+    context,
+    info,
+}: ResolverData<ContextType>) => boolean
+
 @InputType()
 class Credentials {
     @Field()
@@ -37,4 +50,6 @@ class Credentials {
     password!: string
 }
 
-export { PaginatedResponse, ContextType, Credentials }
+type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'LOGGED_IN'
+
+export { PaginatedResponse, ContextType, Credentials, RoleChecker, RoleTypes }

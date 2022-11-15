@@ -1,11 +1,35 @@
 import { AuthChecker } from 'type-graphql'
-import type { ContextType } from '@graphql/types'
+import { ContextType, RoleChecker, RoleTypes } from '@graphql/types'
+import LoggedInAuthChecker from './authCheckers/loggedInAuthChecker'
 
-export const authChecker: AuthChecker<ContextType> = (
+const roleCheckers = {
+    LOGGED_IN: LoggedInAuthChecker,
+    //TODO: Implementar todos los demas
+    ADMIN: LoggedInAuthChecker,
+    PROFESSOR: LoggedInAuthChecker,
+    STUDENT: LoggedInAuthChecker,
+    NODO: LoggedInAuthChecker,
+}
+
+const getAuthCheckerForRole = (role: RoleTypes): RoleChecker => {
+    if (!roleCheckers.hasOwnProperty(role))
+        throw new Error(`Invalid role ${role}`)
+    return roleCheckers[role]
+}
+
+export const authChecker: AuthChecker<ContextType, RoleTypes> = (
     { root, args, context, info },
     roles
 ) => {
-    console.log(context)
+    // Always check if user is logged in
+    const loggedInRoleChecker = getAuthCheckerForRole('LOGGED_IN')
+    if (!loggedInRoleChecker({ root, args, context, info })) return false
+
+    // Check any other necessary roles
+    roles.forEach((role) => {
+        const roleChecker = getAuthCheckerForRole(role)
+        if (!roleChecker({ root, args, context, info })) return false
+    })
     return true
 }
 
