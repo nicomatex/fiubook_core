@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken'
-import config from '@config/default'
+import jwt from 'jsonwebtoken';
+import config from '@config/default';
 
 enum PaginatedQueryType {
     Users,
@@ -16,7 +16,7 @@ type PaginationTokenPayload = {
 const genPaginationToken = (
     id: string,
     ts: string,
-    type: PaginatedQueryType
+    type: PaginatedQueryType,
 ): string => {
     const token = jwt.sign(
         {
@@ -24,23 +24,23 @@ const genPaginationToken = (
             ts,
             type,
         },
-        config.pagination.secret
-    )
-    return token
-}
+        config.pagination.secret,
+    );
+    return token;
+};
 
 const decodePaginationToken = (
     token: string,
-    expectedType: PaginatedQueryType
+    expectedType: PaginatedQueryType,
 ): PaginationTokenPayload => {
     const data = jwt.verify(
         token,
-        config.pagination.secret
-    ) as PaginationTokenPayload
+        config.pagination.secret,
+    ) as PaginationTokenPayload;
     if (data.type !== expectedType) {
-        throw new Error('Pagination token type is not valid for this query')
+        throw new Error('Pagination token type is not valid for this query');
     }
-    return data
-}
+    return data;
+};
 
-export { genPaginationToken, decodePaginationToken, PaginatedQueryType }
+export { genPaginationToken, decodePaginationToken, PaginatedQueryType };

@@ -3,4 +3,5 @@ type PaginatedQueryResult<Type> = {
     paginationToken?: string
 }
 
-export { PaginatedQueryResult }
+// eslint-disable-next-line import/prefer-default-export
+export { PaginatedQueryResult };

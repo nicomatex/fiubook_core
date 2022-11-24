@@ -1,25 +1,25 @@
-import { MaxLength } from 'class-validator'
+import { MaxLength } from 'class-validator';
 import {
     ClassType,
     Field,
     InputType,
     ObjectType,
     ResolverData,
-} from 'type-graphql'
+} from 'type-graphql';
 
 function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
     @ObjectType({ isAbstract: true })
     abstract class PaginatedResponseClass {
         // here we use the runtime argument
-        @Field((type) => [TItemClass])
+        @Field(() => [TItemClass])
         // and here the generic type
-        items!: TItem[]
+            items!: TItem[];
 
         @Field({ nullable: true })
-        paginationToken?: string
+            paginationToken?: string;
     }
-    return PaginatedResponseClass
+    return PaginatedResponseClass;
 }
 
 type LoggedInContextType = {
@@ -45,13 +45,16 @@ type RoleChecker = ({
 class Credentials {
     @Field()
     @MaxLength(128)
-    dni!: string
+        dni!: string;
 
     @Field()
     @MaxLength(128)
-    password!: string
+        password!: string;
 }
 
 type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'LOGGED_IN'
 
-export { PaginatedResponse, ContextType, Credentials, RoleChecker, RoleTypes, LoggedInContextType, NotLoggedInContextType }
+export {
+    PaginatedResponse, ContextType, Credentials, RoleChecker,
+    RoleTypes, LoggedInContextType, NotLoggedInContextType,
+};

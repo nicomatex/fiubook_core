@@ -1,14 +1,8 @@
-import { ContextType } from '@graphql/types'
-import { ResolverData } from 'type-graphql'
+import { ContextType } from '@graphql/types';
+import { ResolverData } from 'type-graphql';
 
 const LoggedInAuthChecker = ({
-    root,
-    args,
     context,
-    info,
-}: ResolverData<ContextType>): boolean => {
-    const array = Array()
-    return context.isLoggedIn
-}
+}: ResolverData<ContextType>): boolean => context.isLoggedIn;
 
-export default LoggedInAuthChecker
+export default LoggedInAuthChecker;

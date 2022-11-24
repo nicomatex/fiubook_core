@@ -1,9 +1,9 @@
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
 class Session {
-    @Field((type) => ID)
-    token!: string
+    @Field(() => ID)
+        token!: string;
 }
 
-export { Session }
+export default Session;

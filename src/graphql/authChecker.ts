@@ -36,6 +36,7 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = (
     ) { return false; }
 
     // Check any other necessary roles
+    // eslint-disable-next-line consistent-return
     roles.forEach((role) => {
         const roleChecker = getAuthCheckerForRole(role);
         if (
