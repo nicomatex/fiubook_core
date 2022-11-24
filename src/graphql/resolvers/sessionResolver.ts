@@ -15,7 +15,13 @@ class SessionResolver {
     async createSession(
         @Arg('credentials') credentials: Credentials
     ): Promise<Session> {
-        const user = await userRepository.getUserByDNI(credentials.dni)
+        let user = await userRepository.getUserByDNI(credentials.dni)
+
+        // First time login case
+        if(user === null){
+            user = await userRepository.addUser(credentials.dni)
+        }
+
         const token = createSessionToken(user)
         return {
             token,

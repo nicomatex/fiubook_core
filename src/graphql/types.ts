@@ -22,15 +22,17 @@ function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     return PaginatedResponseClass
 }
 
-type ContextType =
-    | {
-          isLoggedIn: true
-          userId: string
-          roles: string[]
-      }
-    | {
-          isLoggedIn: false
-      }
+type LoggedInContextType = {
+    isLoggedIn: true
+    userId: string
+    roles: string[]
+}
+
+type NotLoggedInContextType = {
+    isLoggedIn: false
+}
+
+type ContextType = LoggedInContextType | NotLoggedInContextType;
 
 type RoleChecker = ({
     root,
@@ -52,4 +54,4 @@ class Credentials {
 
 type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'LOGGED_IN'
 
-export { PaginatedResponse, ContextType, Credentials, RoleChecker, RoleTypes }
+export { PaginatedResponse, ContextType, Credentials, RoleChecker, RoleTypes, LoggedInContextType, NotLoggedInContextType }

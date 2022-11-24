@@ -26,10 +26,10 @@ const addUser = async (dni: string): Promise<User> => {
     return insertedUser
 }
 
-const getUserByDNI = async (dni: string): Promise<User> => {
+const getUserByDNI = async (dni: string): Promise<User|null> => {
     const res = await connection('users').where({ dni })
     console.log(res)
-    if (res.length === 0) throw new Error(`User with DNI ${dni} not found`)
+    if (res.length === 0) return null
     const user = res[0]
 
     // Parse postgres array into JS array
