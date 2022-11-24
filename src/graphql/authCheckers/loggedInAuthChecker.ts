@@ -7,6 +7,7 @@ const LoggedInAuthChecker = ({
     context,
     info,
 }: ResolverData<ContextType>): boolean => {
+    const array = Array()
     return context.isLoggedIn
 }
 

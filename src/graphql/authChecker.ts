@@ -1,36 +1,54 @@
-import { AuthChecker } from 'type-graphql'
-import { ContextType, RoleChecker, RoleTypes } from '@graphql/types'
-import LoggedInAuthChecker from './authCheckers/loggedInAuthChecker'
+import { AuthChecker } from 'type-graphql';
+import { ContextType, RoleChecker, RoleTypes } from '@graphql/types';
+import LoggedInAuthChecker from '@graphql/authCheckers/loggedInAuthChecker';
 
 const roleCheckers = {
     LOGGED_IN: LoggedInAuthChecker,
-    //TODO: Implementar todos los demas
+    // TODO: Implementar todos los demas
     ADMIN: LoggedInAuthChecker,
     PROFESSOR: LoggedInAuthChecker,
     STUDENT: LoggedInAuthChecker,
     NODO: LoggedInAuthChecker,
-}
+};
 
 const getAuthCheckerForRole = (role: RoleTypes): RoleChecker => {
-    if (!roleCheckers.hasOwnProperty(role))
-        throw new Error(`Invalid role ${role}`)
-    return roleCheckers[role]
-}
+    if (roleCheckers[role] === undefined) {
+        throw new Error(`Invalid role ${role}`);
+    }
+    return roleCheckers[role];
+};
 
 export const authChecker: AuthChecker<ContextType, RoleTypes> = (
-    { root, args, context, info },
-    roles
+    {
+        root, args, context, info,
+    },
+    roles,
 ) => {
     // Always check if user is logged in
-    const loggedInRoleChecker = getAuthCheckerForRole('LOGGED_IN')
-    if (!loggedInRoleChecker({ root, args, context, info })) return false
+    const loggedInRoleChecker = getAuthCheckerForRole('LOGGED_IN');
+    if (
+        !loggedInRoleChecker({
+            root,
+            args,
+            context,
+            info,
+        })
+    ) { return false; }
 
     // Check any other necessary roles
     roles.forEach((role) => {
-        const roleChecker = getAuthCheckerForRole(role)
-        if (!roleChecker({ root, args, context, info })) return false
-    })
-    return true
-}
+        const roleChecker = getAuthCheckerForRole(role);
+        if (
+            !roleChecker({
+                root,
+                args,
+                context,
+                info,
+            })
+        ) { return false; }
+    });
 
-export default authChecker
+    return true;
+};
+
+export default authChecker;
