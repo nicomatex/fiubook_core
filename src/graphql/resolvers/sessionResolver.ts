@@ -4,7 +4,7 @@ import {
 } from 'type-graphql';
 
 import Session from '@graphql/schemas/session';
-import CheckFiubaCredentialsMiddleware from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
+import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials } from '@graphql/types';
 import userRepository from '@repositories/userRepository';
 import { createSessionToken } from '@util/authUtil';
@@ -12,7 +12,7 @@ import { createSessionToken } from '@util/authUtil';
 @Resolver(Session)
 class SessionResolver {
     @Mutation(() => Session)
-    @UseMiddleware(CheckFiubaCredentialsMiddleware)
+    @UseMiddleware(CheckFiubaCredentialsGuard)
     async createSession(
         @Arg('credentials') credentials: Credentials,
     ): Promise<Session> {

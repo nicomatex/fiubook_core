@@ -1,7 +1,7 @@
 import { checkFIUBACredentials } from '@util/authUtil';
 import { MiddlewareFn } from 'type-graphql';
 
-const CheckFiubaCredentialsMiddleware: MiddlewareFn = async (
+const CheckFiubaCredentialsGuard: MiddlewareFn = async (
     { args },
     next,
 ) => {
@@ -15,4 +15,4 @@ const CheckFiubaCredentialsMiddleware: MiddlewareFn = async (
     return next();
 };
 
-export default CheckFiubaCredentialsMiddleware;
+export default CheckFiubaCredentialsGuard;

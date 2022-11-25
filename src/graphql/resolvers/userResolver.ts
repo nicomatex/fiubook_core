@@ -14,7 +14,7 @@ import {
 
 import { PaginatedUserResponse, User } from '@graphql/schemas/user';
 import userRepository from '@repositories/userRepository';
-import CheckFiubaCredentialsMiddleware from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
+import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials } from '@graphql/types';
 
 @ArgsType()
@@ -49,7 +49,7 @@ class UserResolver {
     }
 
     @Mutation(() => User)
-    @UseMiddleware(CheckFiubaCredentialsMiddleware)
+    @UseMiddleware(CheckFiubaCredentialsGuard)
     async addUser(@Arg('credentials') credentials: Credentials): Promise<User> {
         try {
             const res = await userRepository.addUser(credentials.dni);
