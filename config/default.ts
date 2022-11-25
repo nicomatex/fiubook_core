@@ -1,7 +1,11 @@
-const dbPort = parseInt(process.env.DATABASE_PORT ?? '0')
-const pageSize = parseInt(process.env.PAGE_SIZE ?? '50')
+const dbPort = parseInt(process.env.DATABASE_PORT ?? '0', 10);
+const pageSize = parseInt(process.env.PAGE_SIZE ?? '50', 10);
+const listeningPort = parseInt(process.env.LISTENING_PORT ?? '3000', 10);
 
 const config = {
+    server: {
+        port: listeningPort,
+    },
     knex: {
         client: 'pg',
         connection: {
@@ -15,13 +19,17 @@ const config = {
 
     pagination: {
         secret: process.env.PAGINATION_SECRET || 'yerbamate',
-        pageSize: pageSize,
+        pageSize,
     },
 
     session: {
         secret: process.env.SESSION_SECRET || 'playadito',
         sessionDuration: process.env.SESSION_DEFAULT_DURATION || '7 days',
     },
-}
 
-export default config
+    log: {
+        level: 'debug',
+    },
+};
+
+export default config;

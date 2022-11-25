@@ -3,6 +3,8 @@ import express from 'express';
 import schema from '@graphql/schema';
 import { graphqlHTTP } from 'express-graphql';
 import { buildContext } from '@util/contextUtil';
+import logger from '@util/logger';
+import config from '@config/default';
 
 const app = express();
 
@@ -24,6 +26,6 @@ app.use(
     }),
 );
 
-app.listen(3000, () => {
-    console.log('App listening on 3000');
+app.listen(config.server.port, () => {
+    logger.info(`App listening on port ${config.server.port}`);
 });
