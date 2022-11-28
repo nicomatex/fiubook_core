@@ -4,6 +4,7 @@ import {
     Field,
     InputType,
     ObjectType,
+    registerEnumType,
     ResolverData,
 } from 'type-graphql';
 
@@ -54,7 +55,30 @@ class Credentials {
 
 type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'LOGGED_IN'
 
+enum BookingType{
+    AUTOMATIC,
+    REQUIRES_CONFIRMATION
+}
+
+enum UniversityRole{
+    STUDENT,
+    PROFESSOR,
+    NODO
+}
+
+// Required to use these enums in Type-GraphQL.
+registerEnumType(BookingType, {
+    name: 'BookingType',
+    description: 'Type of reservation. Either REQUIRES_CONFIRMATION or AUTOMATIC',
+});
+
+registerEnumType(UniversityRole, {
+    name: 'UniversityRole',
+    description: 'Unversity role. STUDENT, PROFESSOR or NODO',
+});
+
 export {
     PaginatedResponse, ContextType, Credentials, RoleChecker,
     RoleTypes, LoggedInContextType, NotLoggedInContextType,
+    BookingType, UniversityRole,
 };

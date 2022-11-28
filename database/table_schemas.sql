@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS services(
         granularity INTERVAL,
         min_time INTEGER NOT NULL DEFAULT '1',
         max_time INTEGER,
-        booking_type BOOKING_TYPE,
+        booking_type BOOKING_TYPE NOT NULL,
         allowed_roles UNIVERSITY_ROLE[]
 );
 
