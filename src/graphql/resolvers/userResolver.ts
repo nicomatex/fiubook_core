@@ -12,18 +12,12 @@ import {
     UseMiddleware,
 } from 'type-graphql';
 
-import { PaginatedUserResponse, User } from '@graphql/schemas/user';
+import { GetUsersArgs, PaginatedUserResponse, User } from '@graphql/schemas/user';
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials } from '@graphql/types';
 
-@ArgsType()
-class UsersArgs {
-    @Field({ nullable: true })
-        paginationToken?: string;
-}
-
-@Resolver(User)
+@Resolver()
 class UserResolver {
     @Query(() => User)
     async user(
@@ -43,7 +37,7 @@ class UserResolver {
 
     @Query(() => PaginatedUserResponse)
     @Authorized(['ADMIN'])
-    async users(@Args() { paginationToken }: UsersArgs) {
+    async users(@Args() { pagination_token: paginationToken }: GetUsersArgs) {
         const res = await userRepository.getUsers(paginationToken);
         return res;
     }

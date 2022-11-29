@@ -9,7 +9,7 @@ import { Credentials } from '@graphql/types';
 import userRepository from '@repositories/userRepository';
 import { createSessionToken } from '@util/authUtil';
 
-@Resolver(Session)
+@Resolver()
 class SessionResolver {
     @Mutation(() => Session)
     @UseMiddleware(CheckFiubaCredentialsGuard)

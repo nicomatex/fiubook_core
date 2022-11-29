@@ -1,8 +1,33 @@
 import {
+    ArgsType,
     Field, ID, Int, ObjectType,
 } from 'type-graphql';
 
 import { BookingType, UniversityRole } from '@graphql/types';
+
+@ArgsType()
+export class CreateServiceArgs {
+    @Field(() => String)
+        name!: string;
+
+    @Field(() => String)
+        description!: string;
+
+    @Field(() => Int)
+        granularity!: number;
+
+    @Field(() => Int)
+        min_time!: number;
+
+    @Field(() => Int, { nullable: true })
+        max_time?: number;
+
+    @Field(() => BookingType)
+        booking_type!: BookingType;
+
+    @Field(() => [UniversityRole])
+        allowed_roles!: UniversityRole[];
+}
 
 @ObjectType()
 class Service {
@@ -22,16 +47,16 @@ class Service {
         granularity!: number;
 
     @Field(() => Int, { description: 'Minimum amount of time slots to reserve' })
-        minTime!: number;
+        min_time!: number;
 
     @Field(() => Int, { description: 'Maximum amount of time slots to reserve', nullable: true })
-        maxTime?: number;
+        max_time?: number;
 
     @Field(() => BookingType)
-        bookingType!: BookingType;
+        booking_type!: BookingType;
 
     @Field(() => [UniversityRole])
-        allowedRoles!: UniversityRole[];
+        allowed_roles!: UniversityRole[];
 }
 
 export default Service;

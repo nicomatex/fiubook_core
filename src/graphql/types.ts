@@ -56,14 +56,14 @@ class Credentials {
 type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'LOGGED_IN'
 
 enum BookingType{
-    AUTOMATIC,
-    REQUIRES_CONFIRMATION
+    AUTOMATIC = 'AUTOMATIC',
+    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION'
 }
 
 enum UniversityRole{
-    STUDENT,
-    PROFESSOR,
-    NODO
+    STUDENT = 'STUDENT',
+    PROFESSOR = 'PROFESSOR',
+    NODO = 'NODO'
 }
 
 // Required to use these enums in Type-GraphQL.

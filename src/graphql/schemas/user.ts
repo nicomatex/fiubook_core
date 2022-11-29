@@ -1,6 +1,14 @@
 /* eslint-disable max-classes-per-file */
 import { PaginatedResponse } from '@graphql/types';
-import { Field, ID, ObjectType } from 'type-graphql';
+import {
+    ArgsType, Field, ID, ObjectType,
+} from 'type-graphql';
+
+@ArgsType()
+class GetUsersArgs {
+    @Field({ nullable: true })
+        pagination_token?: string;
+}
 
 @ObjectType()
 class User {
@@ -15,9 +23,12 @@ class User {
 
     @Field(() => [String])
         roles!: string[];
+
+    @Field(() => Boolean)
+        can_publish_services!: boolean;
 }
 
 @ObjectType()
 class PaginatedUserResponse extends PaginatedResponse(User) {}
 
-export { User, PaginatedUserResponse };
+export { User, PaginatedUserResponse, GetUsersArgs };

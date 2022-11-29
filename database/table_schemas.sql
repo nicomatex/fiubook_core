@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users(
     id CHAR(36) PRIMARY KEY,
     ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
     dni VARCHAR(128) NOT NULL UNIQUE,
-    roles UNIVERSITY_ROLE[] NOT NULL
+    roles UNIVERSITY_ROLE[] NOT NULL,
+    can_publish_services BOOLEAN NOT NULL
 );
 
 -- Index on timestamp used for pagination
@@ -17,11 +18,11 @@ CREATE TABLE IF NOT EXISTS services(
 		publisher_id CHAR(36) REFERENCES users(id),
         name VARCHAR(128) NOT NULL,
         description VARCHAR(512),
-        granularity INTERVAL,
+        granularity INTERVAL NOT NULL,
         min_time INTEGER NOT NULL DEFAULT '1',
         max_time INTEGER,
         booking_type BOOKING_TYPE NOT NULL,
-        allowed_roles UNIVERSITY_ROLE[]
+        allowed_roles UNIVERSITY_ROLE[] NOT NULL
 );
 
 -- Index on timestamp used for pagination
