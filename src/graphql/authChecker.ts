@@ -1,9 +1,13 @@
 import { AuthChecker } from 'type-graphql';
-import { ContextType, RoleChecker, RoleTypes } from '@graphql/types';
+import {
+    ContextType, LoggedInContextType, RoleChecker, RoleTypes,
+} from '@graphql/types';
 import LoggedInAuthChecker from '@graphql/authCheckers/loggedInAuthChecker';
+import CanPublishServicesAuthChecker from '@graphql/authCheckers/canPublishServicesAuthChecker';
+import logger from '@util/logger';
 
 const roleCheckers = {
-    LOGGED_IN: LoggedInAuthChecker,
+    PUBLISHER: CanPublishServicesAuthChecker,
     // TODO: Implementar todos los demas
     ADMIN: LoggedInAuthChecker,
     PROFESSOR: LoggedInAuthChecker,
@@ -25,9 +29,8 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = (
     roles,
 ) => {
     // Always check if user is logged in
-    const loggedInRoleChecker = getAuthCheckerForRole('LOGGED_IN');
     if (
-        !loggedInRoleChecker({
+        !LoggedInAuthChecker({
             root,
             args,
             context,
@@ -35,21 +38,25 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = (
         })
     ) { return false; }
 
+    const loggedInContext = context as LoggedInContextType;
     // Check any other necessary roles
     // eslint-disable-next-line consistent-return
-    roles.forEach((role) => {
+
+    return roles.every((role) => {
         const roleChecker = getAuthCheckerForRole(role);
+        logger.debug(`Checking permissions for role ${role}`);
         if (
             !roleChecker({
                 root,
                 args,
-                context,
+                context: loggedInContext,
                 info,
             })
-        ) { return false; }
+        ) {
+            return false;
+        }
+        return true;
     });
-
-    return true;
 };
 
 export default authChecker;

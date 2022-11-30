@@ -6,6 +6,7 @@ const createSessionToken = (user: User): string => {
     const tokenPayload = {
         userId: user.id,
         roles: user.roles,
+        canPublishServices: user.can_publish_services,
     };
 
     const token = jwt.sign(tokenPayload, config.session.secret, {
@@ -17,12 +18,13 @@ const createSessionToken = (user: User): string => {
 
 const decodeSessionToken = (
     token: string,
-): { userId: string; roles: string[] } => {
+): { userId: string; roles: string[], canPublishServices: boolean} => {
     let payload;
     try {
         payload = jwt.verify(token, config.session.secret) as {
             userId: string
             roles: string[]
+            canPublishServices: boolean
         };
     } catch (e) {
         throw new Error('Invalid authorization token');
@@ -31,6 +33,7 @@ const decodeSessionToken = (
     return {
         userId: payload.userId,
         roles: payload.roles,
+        canPublishServices: payload.canPublishServices,
     };
 };
 

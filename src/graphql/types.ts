@@ -27,6 +27,7 @@ type LoggedInContextType = {
     isLoggedIn: true
     userId: string
     roles: string[]
+    canPublishServices: boolean
 }
 
 type NotLoggedInContextType = {
@@ -40,7 +41,7 @@ type RoleChecker = ({
     args,
     context,
     info,
-}: ResolverData<ContextType>) => boolean
+}: ResolverData<LoggedInContextType>) => boolean
 
 @InputType()
 class Credentials {
@@ -52,8 +53,7 @@ class Credentials {
     @MaxLength(128)
         password!: string;
 }
-
-type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'LOGGED_IN'
+type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'PUBLISHER'
 
 enum BookingType{
     AUTOMATIC = 'AUTOMATIC',

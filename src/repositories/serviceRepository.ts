@@ -10,14 +10,15 @@ Promise<Service> => {
     const id = uuidv4();
 
     const newService = {
+        ...creationArgs,
         id,
         publisher_id: publisherId,
+        granularity: creationArgs.granularity.toString(),
     };
 
-    // TODO: this is incomplete
     const insertionResult = await connection('services').insert(newService).returning('*');
     const insertedService = insertionResult[0];
     return insertedService;
 };
 
-export { addService };
+export default { addService };

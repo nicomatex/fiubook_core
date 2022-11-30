@@ -1,11 +1,10 @@
 import {
-    ArgsType,
-    Field, ID, Int, ObjectType,
+    Field, ID, InputType, Int, ObjectType,
 } from 'type-graphql';
 
 import { BookingType, UniversityRole } from '@graphql/types';
 
-@ArgsType()
+@InputType()
 export class CreateServiceArgs {
     @Field(() => String)
         name!: string;
