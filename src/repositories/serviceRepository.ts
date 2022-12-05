@@ -1,5 +1,6 @@
 import config from '@config/default';
-import Service, { CreateServiceArgs } from '@graphql/schemas/service';
+import { CreateServiceArgs, PaginatedServiceResponse, Service } from '@graphql/schemas/service';
+import logger from '@util/logger';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -13,7 +14,7 @@ Promise<Service> => {
         ...creationArgs,
         id,
         publisher_id: publisherId,
-        granularity: creationArgs.granularity.toString(),
+        granularity: { seconds: creationArgs.granularity },
     };
 
     const insertionResult = await connection('services').insert(newService).returning('*');
@@ -21,4 +22,15 @@ Promise<Service> => {
     return insertedService;
 };
 
-export default { addService };
+const getServices = async (
+    paginationToken?: string,
+): Promise<PaginatedServiceResponse> => {
+    const data = await connection('services').orderBy('ts').orderBy('id').limit(config.pagination.pageSize);
+    logger.debug(`${JSON.stringify(data)}`);
+
+    return {
+        items: data,
+        paginationToken: 'falopa',
+    };
+};
+export default { addService, getServices };

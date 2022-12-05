@@ -1,10 +1,10 @@
 /* eslint-disable class-methods-use-this */
-import Service, { CreateServiceArgs } from '@graphql/schemas/service';
+import { CreateServiceArgs, PaginatedServiceResponse, Service } from '@graphql/schemas/service';
 import {
     Arg,
     Authorized,
     Ctx,
-    Mutation, Resolver,
+    Mutation, Query, Resolver,
 } from 'type-graphql';
 import serviceRepository from '@repositories/serviceRepository';
 import { LoggedInContextType } from '@graphql/types';
@@ -24,6 +24,13 @@ class ServiceResolver {
             }
             throw err;
         }
+    }
+
+    @Query(() => PaginatedServiceResponse)
+    @Authorized()
+    async services() {
+        const res = await serviceRepository.getServices();
+        return res;
     }
 }
 

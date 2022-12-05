@@ -2,7 +2,7 @@ import {
     Field, ID, InputType, Int, ObjectType,
 } from 'type-graphql';
 
-import { BookingType, UniversityRole } from '@graphql/types';
+import { BookingType, PaginatedResponse, UniversityRole } from '@graphql/types';
 
 @InputType()
 export class CreateServiceArgs {
@@ -34,7 +34,7 @@ class Service {
         id!: string;
 
     @Field(() => ID)
-        publisherID!: string;
+        publisher_id!: string;
 
     @Field(() => String)
         name!: string;
@@ -58,4 +58,7 @@ class Service {
         allowed_roles!: UniversityRole[];
 }
 
-export default Service;
+@ObjectType()
+class PaginatedServiceResponse extends PaginatedResponse(Service) {}
+
+export { Service, PaginatedServiceResponse };
