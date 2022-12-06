@@ -27,6 +27,7 @@
         "jsonwebtoken": "^8.5.1",
         "knex": "^2.3.0",
         "pg": "^8.8.0",
+        "pg-tsquery": "^8.4.0",
         "postgres-array": "^3.0.1",
         "reflect-metadata": "^0.1.13",
         "type-graphql": "^1.1.1",

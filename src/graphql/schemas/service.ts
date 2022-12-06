@@ -9,6 +9,9 @@ import { BookingType, PaginatedResponse, UniversityRole } from '@graphql/types';
 class GetServicesArgs {
     @Field({ nullable: true })
         pagination_token?: string;
+
+    @Field(() => String, { nullable: true })
+        query_term?: string;
 }
 
 @InputType()

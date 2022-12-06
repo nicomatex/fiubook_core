@@ -31,8 +31,10 @@ class ServiceResolver {
 
     @Query(() => PaginatedServiceResponse)
     @Authorized()
-    async services(@Args() { pagination_token: paginationToken }: GetServicesArgs) {
-        const res = await serviceRepository.getServices(paginationToken);
+    async services(@Args()
+        { pagination_token: paginationToken, query_term: queryTerm }:
+    GetServicesArgs) {
+        const res = await serviceRepository.getServices(paginationToken, queryTerm);
         return res;
     }
 }

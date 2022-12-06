@@ -22,11 +22,13 @@ CREATE TABLE IF NOT EXISTS services(
         min_time INTEGER NOT NULL DEFAULT '1',
         max_time INTEGER,
         booking_type BOOKING_TYPE NOT NULL,
-        allowed_roles UNIVERSITY_ROLE[] NOT NULL
+        allowed_roles UNIVERSITY_ROLE[] NOT NULL,
+        search_index tsvector GENERATED ALWAYS AS (to_tsvector('spanish', name || ' ' || description)) STORED -- Index column for term searching
 );
 
 -- Index on timestamp used for pagination
 CREATE INDEX ts_idx_services ON services USING btree (ts);
+CREATE INDEX search_idx_services ON services USING GIN (search_index); -- Index used for searching
 
 CREATE TABLE IF NOT EXISTS bookings(
     id CHAR(36) PRIMARY KEY,
