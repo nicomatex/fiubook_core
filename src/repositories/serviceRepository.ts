@@ -1,5 +1,6 @@
 import config from '@config/default';
 import { CreateServiceArgs, PaginatedServiceResponse, Service } from '@graphql/schemas/service';
+import { decodePaginationToken, genPaginationToken, PaginatedQueryType } from '@util/dbUtil';
 import logger from '@util/logger';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,12 +26,39 @@ Promise<Service> => {
 const getServices = async (
     paginationToken?: string,
 ): Promise<PaginatedServiceResponse> => {
-    const data = await connection('services').orderBy('ts').orderBy('id').limit(config.pagination.pageSize);
+    let data;
+
+    if (paginationToken !== undefined) {
+        const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Services);
+        const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
+        data = await connection('services')
+            // Keyset Pagination condition
+            .whereRaw(
+                `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
+            )
+            .orderBy('ts')
+            .orderBy('id')
+            .limit(config.pagination.pageSize);
+    } else {
+        data = await connection('services').orderBy('ts').orderBy('id').limit(config.pagination.pageSize);
+    }
+
+    if (data.length === config.pagination.pageSize) {
+        const lastRecord = data[data.length - 1] as Service;
+        const newPaginationToken = genPaginationToken(
+            lastRecord.id,
+            lastRecord.ts,
+            PaginatedQueryType.Services,
+        );
+        return {
+            items: data,
+            paginationToken: newPaginationToken,
+        };
+    }
     logger.debug(`${JSON.stringify(data)}`);
 
     return {
         items: data,
-        paginationToken: 'falopa',
     };
 };
 export default { addService, getServices };

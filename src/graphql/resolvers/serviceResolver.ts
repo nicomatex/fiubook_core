@@ -1,7 +1,10 @@
 /* eslint-disable class-methods-use-this */
-import { CreateServiceArgs, PaginatedServiceResponse, Service } from '@graphql/schemas/service';
+import {
+    CreateServiceArgs, GetServicesArgs, PaginatedServiceResponse, Service,
+} from '@graphql/schemas/service';
 import {
     Arg,
+    Args,
     Authorized,
     Ctx,
     Mutation, Query, Resolver,
@@ -28,8 +31,8 @@ class ServiceResolver {
 
     @Query(() => PaginatedServiceResponse)
     @Authorized()
-    async services() {
-        const res = await serviceRepository.getServices();
+    async services(@Args() { pagination_token: paginationToken }: GetServicesArgs) {
+        const res = await serviceRepository.getServices(paginationToken);
         return res;
     }
 }

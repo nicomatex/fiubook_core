@@ -1,8 +1,15 @@
 import {
+    ArgsType,
     Field, ID, InputType, Int, ObjectType,
 } from 'type-graphql';
 
 import { BookingType, PaginatedResponse, UniversityRole } from '@graphql/types';
+
+@ArgsType()
+class GetServicesArgs {
+    @Field({ nullable: true })
+        pagination_token?: string;
+}
 
 @InputType()
 export class CreateServiceArgs {
@@ -30,6 +37,9 @@ export class CreateServiceArgs {
 
 @ObjectType()
 class Service {
+    @Field(() => String)
+        ts!: string;
+
     @Field(() => ID)
         id!: string;
 
@@ -61,4 +71,4 @@ class Service {
 @ObjectType()
 class PaginatedServiceResponse extends PaginatedResponse(Service) {}
 
-export { Service, PaginatedServiceResponse };
+export { Service, PaginatedServiceResponse, GetServicesArgs };
