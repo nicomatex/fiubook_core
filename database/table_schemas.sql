@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS bookings(
     requestor_id CHAR(36) REFERENCES users(id),
     publisher_id CHAR(36) REFERENCES users(id),
     start_date TIMESTAMPTZ NOT NULL, 
-    duration INTERVAL NOT NULL
+    end_date TIMESTAMPTZ NOT NULL
 );
 
 -- Index on timestamp used for pagination

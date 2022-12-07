@@ -39,3 +39,7 @@ logs:
 reload: push
 	kubectl rollout restart deployment fiubook-core-deployment
 .PHONY: reload
+
+restart: 
+	kubectl rollout restart deployment fiubook-core-deployment
+.PHONY: restart
