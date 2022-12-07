@@ -90,4 +90,39 @@ const getServices = async (
         items: data,
     };
 };
-export default { addService, getServices };
+
+const getServicesByUserId = async (userId: string, paginationToken?: string) => {
+    let query = connection('services')
+        .where({ publisher_id: userId })
+        .orderBy('ts')
+        .orderBy('id')
+        .limit(config.pagination.pageSize);
+
+    if (paginationToken !== undefined) {
+        const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Services);
+        const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
+
+        query = query
+        // Keyset Pagination condition
+            .whereRaw(
+                `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
+            );
+    }
+    const data = await query;
+    if (data.length === config.pagination.pageSize) {
+        const lastRecord = data[data.length - 1] as Service;
+        const newPaginationToken = genPaginationToken(
+            lastRecord.id,
+            lastRecord.ts,
+            PaginatedQueryType.Services,
+        );
+        return {
+            items: data,
+            paginationToken: newPaginationToken,
+        };
+    }
+    return {
+        items: data,
+    };
+};
+export default { addService, getServices, getServicesByUserId };

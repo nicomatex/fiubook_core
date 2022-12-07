@@ -37,6 +37,17 @@ class ServiceResolver {
         const res = await serviceRepository.getServices(paginationToken, queryTerm);
         return res;
     }
+
+    @Query(() => PaginatedServiceResponse)
+    @Authorized()
+    async myServices(
+        @Args()
+            { pagination_token: paginationToken }: GetServicesArgs,
+        @Ctx() ctx: LoggedInContextType,
+    ) {
+        const res = await serviceRepository.getServicesByUserId(ctx.userId, paginationToken);
+        return res;
+    }
 }
 
 export default ServiceResolver;
