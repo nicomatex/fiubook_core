@@ -4,7 +4,7 @@ import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import { parse } from 'postgres-array';
 import {
-    decodePaginationToken, genPaginationToken, PaginatedQueryType, withPaginationToken,
+    genPaginatedResponse, PaginatedQueryType, withPaginationToken,
 } from '@util/dbUtil';
 
 const connection = knex({ ...config.knex });
@@ -65,19 +65,7 @@ const getUsers = async (
         user.roles = parse(user.roles);
     });
 
-    if (data.length === config.pagination.pageSize) {
-        const lastRecord = data[data.length - 1] as User;
-        const newPaginationToken = genPaginationToken(
-            lastRecord.id,
-            lastRecord.ts,
-            PaginatedQueryType.Users,
-        );
-        return {
-            items: data,
-            paginationToken: newPaginationToken,
-        };
-    }
-    return { items: data };
+    return genPaginatedResponse(data, config.pagination.pageSize, PaginatedQueryType.Users);
 };
 
 export default {

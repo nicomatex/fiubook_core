@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 import config from '@config/default';
 import { Knex } from 'knex';
 import pgTsquery from 'pg-tsquery';
+import { User } from '@graphql/schemas/user';
+import { Service } from '@graphql/schemas/service';
 
 const queryEscaper = pgTsquery();
 
@@ -16,6 +18,9 @@ type PaginationTokenPayload = {
     ts: string
     type: PaginatedQueryType
 }
+
+// Add new paginable data types here
+type PaginableDataType = Service | User;
 
 const genPaginationToken = (
     id: string,
@@ -54,12 +59,35 @@ const withPaginationToken = (queryBuilder: Knex.QueryBuilder, paginationToken?: 
     queryBuilder.whereRaw(`(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`);
 };
 
-const withQueryTerm = (queryBuilder: Knex.QueryBuilder, queryTerm?: string) => {
+const withQueryTerm = (queryBuilder: Knex.QueryBuilder, tsColumn: string, queryTerm?: string) => {
     if (queryTerm === undefined) return;
-    queryBuilder.whereRaw('search_index @@ to_tsquery(\'spanish\',?)', [queryEscaper(queryTerm)]);
+    queryBuilder.whereRaw('?? @@ to_tsquery(\'spanish\',?)', [tsColumn, queryEscaper(queryTerm)]);
+};
+
+const genPaginatedResponse = <T extends PaginableDataType>(
+    data: T[],
+    pageSize: number,
+    dataType: PaginatedQueryType,
+) => {
+    if (data.length < pageSize) {
+        return {
+            items: data,
+        };
+    }
+    const lastRecord = data[data.length - 1];
+    const newPaginationToken = genPaginationToken(
+        lastRecord.id,
+        lastRecord.ts,
+        dataType,
+    );
+    return {
+        items: data,
+        paginationToken: newPaginationToken,
+    };
 };
 
 export {
     genPaginationToken, decodePaginationToken,
     PaginatedQueryType, withPaginationToken, withQueryTerm,
+    genPaginatedResponse,
 };
