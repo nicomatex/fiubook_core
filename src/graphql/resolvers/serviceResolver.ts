@@ -45,7 +45,7 @@ class ServiceResolver {
             { pagination_token: paginationToken }: GetServicesArgs,
         @Ctx() ctx: LoggedInContextType,
     ) {
-        const res = await serviceRepository.getServicesByUserId(ctx.userId, paginationToken);
+        const res = await serviceRepository.getServicesByPublisherId(ctx.userId, paginationToken);
         return res;
     }
 }

@@ -3,7 +3,9 @@ import { PaginatedUserResponse, User } from '@graphql/schemas/user';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import { parse } from 'postgres-array';
-import { decodePaginationToken, genPaginationToken, PaginatedQueryType } from '@util/dbUtil';
+import {
+    decodePaginationToken, genPaginationToken, PaginatedQueryType, withPaginationToken,
+} from '@util/dbUtil';
 
 const connection = knex({ ...config.knex });
 
@@ -50,23 +52,15 @@ const getUserById = async (id: string): Promise<User> => {
 const getUsers = async (
     paginationToken?: string,
 ): Promise<PaginatedUserResponse> => {
-    let query = connection('users')
+    const query = connection('users')
         .orderBy('ts')
         .orderBy('id')
+        .modify(withPaginationToken, paginationToken)
         .limit(config.pagination.pageSize);
 
-    if (paginationToken !== undefined) {
-        const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Users);
-        const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
-
-        query = query
-            .whereRaw(
-                `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
-            );
-    }
     const data = await query;
 
-    data.forEach((user) => {
+    data.forEach((user: any) => {
         // eslint-disable-next-line no-param-reassign
         user.roles = parse(user.roles);
     });
