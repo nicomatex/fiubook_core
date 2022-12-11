@@ -39,39 +39,30 @@ export class CreateServiceArgs {
 }
 
 @ObjectType()
-class Service {
+class Booking {
+    @Field(() => ID)
+        id!: string;
+
     @Field()
         ts!: Date;
 
     @Field(() => ID)
-        id!: string;
+        service_id!: string;
+
+    @Field(() => ID)
+        requestor_id!: string;
 
     @Field(() => ID)
         publisher_id!: string;
 
-    @Field(() => String)
-        name!: string;
+    @Field()
+        start_date!: Date;
 
-    @Field(() => String)
-        description!: string;
-
-    @Field(() => Int, { description: 'Time slot granularity in seconds' })
-        granularity!: number;
-
-    @Field(() => Int, { description: 'Minimum amount of time slots to reserve' })
-        min_time!: number;
-
-    @Field(() => Int, { description: 'Maximum amount of time slots to reserve', nullable: true })
-        max_time?: number;
-
-    @Field(() => BookingType)
-        booking_type!: BookingType;
-
-    @Field(() => [UniversityRole])
-        allowed_roles!: UniversityRole[];
+    @Field()
+        end_date!: Date;
 }
 
 @ObjectType()
-class PaginatedServiceResponse extends PaginatedResponse(Service) {}
+class PaginatedBookingResponse extends PaginatedResponse(Booking) {}
 
-export { Service, PaginatedServiceResponse, GetServicesArgs };
+export { Booking, PaginatedBookingResponse, GetServicesArgs };

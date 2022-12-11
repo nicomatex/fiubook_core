@@ -4,6 +4,7 @@ import { Knex } from 'knex';
 import pgTsquery from 'pg-tsquery';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
+import logger from '@util/logger';
 
 const queryEscaper = pgTsquery();
 
@@ -15,7 +16,7 @@ enum PaginatedQueryType {
 
 type PaginationTokenPayload = {
     id: string
-    ts: string
+    ts: Date
     type: PaginatedQueryType
 }
 
@@ -24,7 +25,7 @@ type PaginableDataType = Service | User;
 
 const genPaginationToken = (
     id: string,
-    ts: string,
+    ts: Date,
     type: PaginatedQueryType,
 ): string => {
     const token = jwt.sign(
@@ -80,6 +81,7 @@ const genPaginatedResponse = <T extends PaginableDataType>(
         lastRecord.ts,
         dataType,
     );
+    logger.debug(lastRecord.ts.toISOString());
     return {
         items: data,
         paginationToken: newPaginationToken,

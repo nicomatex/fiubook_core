@@ -16,7 +16,7 @@ class User {
         id!: string;
 
     @Field()
-        ts!: string;
+        ts!: Date;
 
     @Field()
         dni!: string;
