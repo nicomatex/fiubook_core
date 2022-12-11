@@ -32,45 +32,22 @@ const getServices = async (
     paginationToken?: string,
     queryTerm?: string,
 ): Promise<PaginatedServiceResponse> => {
-    let data;
+    let query = connection('services')
+        .orderBy('ts')
+        .orderBy('id')
+        .limit(config.pagination.pageSize);
 
     if (paginationToken !== undefined) {
         const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Services);
         const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
-
-        if (queryTerm !== undefined) {
-            data = await connection('services')
-                // Keyset Pagination condition
-                .whereRaw(
-                    `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
-                ).whereRaw('search_index @@ to_tsquery(\'spanish\',?)', [queryEscaper(queryTerm)])
-                .orderBy('ts')
-                .orderBy('id')
-                .limit(config.pagination.pageSize);
-        } else {
-            logger.debug(`Received service query with search term ${queryTerm}`);
-            data = await connection('services')
-                // Keyset Pagination condition
-                .whereRaw(
-                    `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
-                )
-                .orderBy('ts')
-                .orderBy('id')
-                .limit(config.pagination.pageSize);
-        }
-    } else if (queryTerm !== undefined) {
-        logger.debug(`Received service query with search term ${queryTerm}`);
-        data = await connection('services')
-            .whereRaw('search_index @@ to_tsquery(\'spanish\',?)', [queryEscaper(queryTerm)])
-            .orderBy('ts')
-            .orderBy('id')
-            .limit(config.pagination.pageSize);
-    } else {
-        data = await connection('services')
-            .orderBy('ts')
-            .orderBy('id')
-            .limit(config.pagination.pageSize);
+        query = query.whereRaw(`(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`);
     }
+
+    if (queryTerm !== undefined) {
+        query = query.whereRaw('search_index @@ to_tsquery(\'spanish\',?)', [queryEscaper(queryTerm)]);
+    }
+
+    const data = await query;
 
     if (data.length === config.pagination.pageSize) {
         const lastRecord = data[data.length - 1] as Service;
@@ -99,6 +76,7 @@ const getServicesByUserId = async (userId: string, paginationToken?: string) => 
         .limit(config.pagination.pageSize);
 
     if (paginationToken !== undefined) {
+        // Pagination Token available
         const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Services);
         const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
 
@@ -108,6 +86,7 @@ const getServicesByUserId = async (userId: string, paginationToken?: string) => 
                 `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
             );
     }
+
     const data = await query;
     if (data.length === config.pagination.pageSize) {
         const lastRecord = data[data.length - 1] as Service;
