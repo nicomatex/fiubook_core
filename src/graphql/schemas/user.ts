@@ -26,6 +26,8 @@ class User {
 
     @Field(() => Boolean)
         can_publish_services!: boolean;
+
+    is_admin!: boolean;
 }
 
 @ObjectType()

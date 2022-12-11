@@ -18,6 +18,7 @@ const addUser = async (dni: string): Promise<User> => {
         dni,
         roles: defaultRoles,
         can_publish_services: false,
+        is_admin: false,
     };
     const insertionResult = await connection('users')
         .insert(newUser)

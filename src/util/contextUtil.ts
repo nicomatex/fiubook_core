@@ -14,10 +14,7 @@ const buildContext = (headers: IncomingHttpHeaders): ContextType => {
     if (type !== 'Bearer') throw new Error('Wrong token type, not Bearer');
 
     const sessionPayload = decodeSessionToken(token);
-    return {
-        isLoggedIn: true,
-        ...sessionPayload,
-    };
+    return sessionPayload;
 };
 
 // eslint-disable-next-line import/prefer-default-export

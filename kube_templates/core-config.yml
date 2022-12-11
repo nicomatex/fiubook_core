@@ -14,4 +14,4 @@ data:
     SESSION_SECRET: playadito
     SESSION_DEFAULT_DURATION: '7 days'
     LISTENING_PORT: '3000'
-    PAGE_SIZE: '1'
+    PAGE_SIZE: '10'

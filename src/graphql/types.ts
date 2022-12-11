@@ -28,6 +28,7 @@ type LoggedInContextType = {
     userId: string
     roles: string[]
     canPublishServices: boolean
+    isAdmin: boolean
 }
 
 type NotLoggedInContextType = {
@@ -63,7 +64,7 @@ enum BookingType{
 enum UniversityRole{
     STUDENT = 'STUDENT',
     PROFESSOR = 'PROFESSOR',
-    NODO = 'NODO'
+    NODO = 'NODO',
 }
 
 // Required to use these enums in Type-GraphQL.

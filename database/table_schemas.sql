@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users(
     ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
     dni VARCHAR(128) NOT NULL UNIQUE,
     roles UNIVERSITY_ROLE[] NOT NULL,
-    can_publish_services BOOLEAN NOT NULL
+    can_publish_services BOOLEAN NOT NULL,
+    is_admin BOOLEAN NOT NULL
 );
 
 -- Index on timestamp used for pagination

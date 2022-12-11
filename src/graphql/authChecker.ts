@@ -3,13 +3,14 @@ import {
     ContextType, LoggedInContextType, RoleChecker, RoleTypes,
 } from '@graphql/types';
 import LoggedInAuthChecker from '@graphql/authCheckers/loggedInAuthChecker';
-import CanPublishServicesAuthChecker from '@graphql/authCheckers/canPublishServicesAuthChecker';
+import PublisherAuthChecker from '@graphql/authCheckers/publisherAuthChecker';
 import logger from '@util/logger';
+import AdminAuthChecker from '@graphql/authCheckers/adminAuthChecker';
 
 const roleCheckers = {
-    PUBLISHER: CanPublishServicesAuthChecker,
+    PUBLISHER: PublisherAuthChecker,
+    ADMIN: AdminAuthChecker,
     // TODO: Implementar todos los demas
-    ADMIN: LoggedInAuthChecker,
     PROFESSOR: LoggedInAuthChecker,
     STUDENT: LoggedInAuthChecker,
     NODO: LoggedInAuthChecker,
