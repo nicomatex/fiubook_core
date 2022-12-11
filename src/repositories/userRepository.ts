@@ -50,25 +50,21 @@ const getUserById = async (id: string): Promise<User> => {
 const getUsers = async (
     paginationToken?: string,
 ): Promise<PaginatedUserResponse> => {
-    let data;
+    let query = connection('users')
+        .orderBy('ts')
+        .orderBy('id')
+        .limit(config.pagination.pageSize);
+
     if (paginationToken !== undefined) {
         const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Users);
         const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
 
-        data = await connection('users')
-            // Keyset Pagination condition
+        query = query
             .whereRaw(
                 `(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`,
-            )
-            .orderBy('ts')
-            .orderBy('id')
-            .limit(config.pagination.pageSize);
-    } else {
-        data = await connection('users')
-            .orderBy('ts')
-            .orderBy('id')
-            .limit(config.pagination.pageSize);
+            );
     }
+    const data = await query;
 
     data.forEach((user) => {
         // eslint-disable-next-line no-param-reassign
