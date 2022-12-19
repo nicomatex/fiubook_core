@@ -5,10 +5,9 @@ import {
     PaginatedQueryType,
     withPaginationToken, withQueryTerm,
 } from '@util/dbUtil';
-import logger from '@util/logger';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
-import { parse } from 'postgres-array';
+import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 
 const connection = knex({ ...config.knex });
 
@@ -23,11 +22,11 @@ Promise<Service> => {
         granularity: { seconds: creationArgs.granularity },
     };
 
-    logger.debug(`Adding service ${creationArgs.name}`);
     const insertionResult = await connection('services').insert(newService).returning('*');
     const insertedService = insertionResult[0];
-    logger.debug(`Service ${creationArgs.name} added successfully`);
-    return insertedService;
+
+    const parsedInsertedService = adaptService(insertedService);
+    return parsedInsertedService;
 };
 
 const getServices = async (
@@ -43,7 +42,13 @@ const getServices = async (
 
     const data = await query;
 
-    return genPaginatedResponse(data, config.pagination.pageSize, PaginatedQueryType.Services);
+    const parsedData = data.map(adaptService);
+
+    return genPaginatedResponse(
+        parsedData,
+        config.pagination.pageSize,
+        PaginatedQueryType.Services,
+    );
 };
 
 const getServicesByPublisherId = async (userId: string, paginationToken?: string) => {
@@ -56,7 +61,13 @@ const getServicesByPublisherId = async (userId: string, paginationToken?: string
 
     const data = await query;
 
-    return genPaginatedResponse(data, config.pagination.pageSize, PaginatedQueryType.Services);
+    const parsedData = data.map(adaptService);
+
+    return genPaginatedResponse(
+        parsedData,
+        config.pagination.pageSize,
+        PaginatedQueryType.Services,
+    );
 };
 
 const getServiceById = async (serviceId: string) => {
@@ -67,9 +78,9 @@ const getServiceById = async (serviceId: string) => {
     if (data.length === 0) throw new Error(`Service with id ${serviceId} not found`);
     const service = data[0];
 
-    service.allowed_roles = parse(service.allowed_roles);
+    const parsedService = adaptService(service);
 
-    return service;
+    return parsedService;
 };
 
 export default {

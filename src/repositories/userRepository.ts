@@ -2,10 +2,10 @@ import config from '@config/default';
 import { PaginatedUserResponse, User } from '@graphql/schemas/user';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
-import { parse } from 'postgres-array';
 import {
     genPaginatedResponse, PaginatedQueryType, withPaginationToken,
 } from '@util/dbUtil';
+import adaptUser from '@repositories/dataAdapters/userDataAdapter';
 
 const connection = knex({ ...config.knex });
 
@@ -25,8 +25,8 @@ const addUser = async (dni: string): Promise<User> => {
         .returning('*');
     const insertedUser = insertionResult[0];
 
-    insertedUser.roles = parse(insertedUser.roles);
-    return insertedUser;
+    const parsedInsertedUser = adaptUser(insertedUser);
+    return parsedInsertedUser;
 };
 
 const getUserByDNI = async (dni: string): Promise<User|null> => {
@@ -34,10 +34,8 @@ const getUserByDNI = async (dni: string): Promise<User|null> => {
     if (res.length === 0) return null;
     const user = res[0];
 
-    // Parse postgres array into JS array
-    user.roles = parse(user.roles);
-    user.ts = user.ts.toISOString();
-    return user;
+    const parsedUser = adaptUser(user);
+    return parsedUser;
 };
 
 const getUserById = async (id: string): Promise<User> => {
@@ -45,9 +43,8 @@ const getUserById = async (id: string): Promise<User> => {
     if (res.length === 0) throw new Error(`User with id ${id} not found`);
     const user = res[0];
 
-    // Parse postgres array into JS array
-    user.roles = parse(user.roles);
-    return user;
+    const parsedUser = adaptUser(user);
+    return parsedUser;
 };
 
 const getUsers = async (
@@ -61,12 +58,9 @@ const getUsers = async (
 
     const data = await query;
 
-    data.forEach((user: any) => {
-        // eslint-disable-next-line no-param-reassign
-        user.roles = parse(user.roles);
-    });
+    const parsedData = data.map(adaptUser);
 
-    return genPaginatedResponse(data, config.pagination.pageSize, PaginatedQueryType.Users);
+    return genPaginatedResponse(parsedData, config.pagination.pageSize, PaginatedQueryType.Users);
 };
 
 export default {
