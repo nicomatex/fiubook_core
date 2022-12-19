@@ -14,9 +14,9 @@ const BookingRolesAuthChecker = async ({
         .getServiceById(typedArgs.creationArgs.service_id) as Service;
 
     logger.debug(JSON.stringify(service.allowed_roles));
-    logger.debug(JSON.stringify(args));
+    logger.debug(JSON.stringify(context.roles));
 
-    return true;
+    return context.roles.some((userRole) => service.allowed_roles.includes(userRole));
 };
 
 export default BookingRolesAuthChecker;

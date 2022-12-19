@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import config from '@config/default';
 import { User } from '@graphql/schemas/user';
-import { LoggedInContextType } from '@graphql/types';
+import { LoggedInContextType, UniversityRole } from '@graphql/types';
 
 const createSessionToken = (user: User): string => {
     const tokenPayload = {
@@ -25,7 +25,7 @@ const decodeSessionToken = (
     try {
         payload = jwt.verify(token, config.session.secret) as {
             userId: string
-            roles: string[]
+            roles: UniversityRole[]
             canPublishServices: boolean
             isAdmin: boolean
         };

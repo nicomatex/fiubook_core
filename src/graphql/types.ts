@@ -8,6 +8,19 @@ import {
     ResolverData,
 } from 'type-graphql';
 
+type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
+
+enum BookingType{
+    AUTOMATIC = 'AUTOMATIC',
+    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION'
+}
+
+enum UniversityRole{
+    STUDENT = 'STUDENT',
+    PROFESSOR = 'PROFESSOR',
+    NODO = 'NODO',
+}
+
 function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
     @ObjectType({ isAbstract: true })
@@ -26,7 +39,7 @@ function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
 type LoggedInContextType = {
     isLoggedIn: true
     userId: string
-    roles: string[]
+    roles: UniversityRole[]
     canPublishServices: boolean
     isAdmin: boolean
 }
@@ -53,18 +66,6 @@ class Credentials {
     @Field()
     @MaxLength(128)
         password!: string;
-}
-type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
-
-enum BookingType{
-    AUTOMATIC = 'AUTOMATIC',
-    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION'
-}
-
-enum UniversityRole{
-    STUDENT = 'STUDENT',
-    PROFESSOR = 'PROFESSOR',
-    NODO = 'NODO',
 }
 
 // Required to use these enums in Type-GraphQL.

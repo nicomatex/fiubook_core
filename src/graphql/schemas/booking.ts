@@ -10,9 +10,6 @@ export class CreateBookingArgs {
     @Field(() => ID)
         service_id!: string;
 
-    @Field(() => ID)
-        requestor_id!: string;
-
     @Field()
         start_date!: Date;
 
