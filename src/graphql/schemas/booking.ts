@@ -39,6 +39,9 @@ class Booking {
 
     @Field()
         end_date!: Date;
+
+    @Field()
+        is_confirmed!: boolean;
 }
 
 @ObjectType()
