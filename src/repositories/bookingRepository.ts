@@ -14,10 +14,12 @@ const getConflictingBookings = async (
 ) => {
     const query = connection('bookings')
         .where({ service_id: serviceId })
-        .whereBetween('start_date', [startDate, endDate])
-        .orWhereBetween('end_date', [startDate, endDate])
-        .orWhere((connection) => {
-            connection.where('start_date', '<', startDate).andWhere('end_date', '>', endDate);
+        .andWhere((connection) => {
+            connection.whereBetween('start_date', [startDate, endDate])
+                .orWhereBetween('end_date', [startDate, endDate])
+                .orWhere((connection) => {
+                    connection.where('start_date', '<', startDate).andWhere('end_date', '>', endDate);
+                });
         });
     const res = await query;
     return res;
