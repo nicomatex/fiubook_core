@@ -1,6 +1,9 @@
 import config from '@config/default';
-import logger from '@util/logger';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateBookingArgs } from '@graphql/schemas/booking';
 import knex from 'knex';
+import { Service } from '@graphql/schemas/service';
+import { request } from 'express';
 
 const connection = knex({ ...config.knex });
 
@@ -30,4 +33,24 @@ const getBookingsByRequestorId = async (
     return res;
 };
 
-export { getConflictingBookings, getBookingsByRequestorId };
+const createBooking = async (
+    creationArgs: CreateBookingArgs,
+    requestedService: Service,
+    requestorId: string,
+) => {
+    const newBooking = {
+        ...creationArgs,
+        id: uuidv4(),
+        is_confirmed: requestedService.booking_type === 'AUTOMATIC',
+        requestor_id: requestorId,
+        publisher_id: requestedService.publisher_id,
+        service_id: requestedService.id,
+    };
+
+    const insertionResult = await connection('bookings')
+        .insert(newBooking).returning('*');
+    const insertedBooking = insertionResult[0];
+    return insertedBooking;
+};
+
+export default { getConflictingBookings, getBookingsByRequestorId, createBooking };
