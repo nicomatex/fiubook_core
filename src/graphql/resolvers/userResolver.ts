@@ -20,6 +20,7 @@ import { Credentials } from '@graphql/types';
 @Resolver()
 class UserResolver {
     @Query(() => User)
+    @Authorized(['ADMIN'])
     async user(
         @Arg('id', { nullable: true }) id?: string,
         @Arg('dni', { nullable: true }) dni?: string,

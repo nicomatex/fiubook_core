@@ -3,39 +3,21 @@ import {
     Field, ID, InputType, Int, ObjectType,
 } from 'type-graphql';
 
-import { BookingType, PaginatedResponse, UniversityRole } from '@graphql/types';
-
-@ArgsType()
-class GetServicesArgs {
-    @Field({ nullable: true })
-        pagination_token?: string;
-
-    @Field(() => String, { nullable: true })
-        query_term?: string;
-}
+import { PaginatedResponse } from '@graphql/types';
 
 @InputType()
-export class CreateServiceArgs {
-    @Field(() => String)
-        name!: string;
+export class CreateBookingArgs {
+    @Field(() => ID)
+        service_id!: string;
 
-    @Field(() => String)
-        description!: string;
+    @Field(() => ID)
+        requestor_id!: string;
 
-    @Field(() => Int)
-        granularity!: number;
+    @Field()
+        start_date!: Date;
 
-    @Field(() => Int)
-        min_time!: number;
-
-    @Field(() => Int, { nullable: true })
-        max_time?: number;
-
-    @Field(() => BookingType)
-        booking_type!: BookingType;
-
-    @Field(() => [UniversityRole])
-        allowed_roles!: UniversityRole[];
+    @Field()
+        end_date!: Date;
 }
 
 @ObjectType()
@@ -65,4 +47,4 @@ class Booking {
 @ObjectType()
 class PaginatedBookingResponse extends PaginatedResponse(Booking) {}
 
-export { Booking, PaginatedBookingResponse, GetServicesArgs };
+export { Booking, PaginatedBookingResponse };

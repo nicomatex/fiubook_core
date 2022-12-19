@@ -6,14 +6,12 @@ import LoggedInAuthChecker from '@graphql/authCheckers/loggedInAuthChecker';
 import PublisherAuthChecker from '@graphql/authCheckers/publisherAuthChecker';
 import logger from '@util/logger';
 import AdminAuthChecker from '@graphql/authCheckers/adminAuthChecker';
+import BookingRolesAuthChecker from '@graphql/authCheckers/bookingRolesAuthChecker';
 
 const roleCheckers = {
     PUBLISHER: PublisherAuthChecker,
     ADMIN: AdminAuthChecker,
-    // TODO: Implementar todos los demas
-    PROFESSOR: LoggedInAuthChecker,
-    STUDENT: LoggedInAuthChecker,
-    NODO: LoggedInAuthChecker,
+    BOOKING_ROLES: BookingRolesAuthChecker,
 };
 
 const getAuthCheckerForRole = (role: RoleTypes): RoleChecker => {
@@ -23,7 +21,7 @@ const getAuthCheckerForRole = (role: RoleTypes): RoleChecker => {
     return roleCheckers[role];
 };
 
-export const authChecker: AuthChecker<ContextType, RoleTypes> = (
+export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
     {
         root, args, context, info,
     },
@@ -40,24 +38,18 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = (
     ) { return false; }
 
     const loggedInContext = context as LoggedInContextType;
-    // Check any other necessary roles
-    // eslint-disable-next-line consistent-return
 
-    return roles.every((role) => {
+    // Check any other necessary roles
+    // eslint-disable-next-line no-restricted-syntax
+    for (const role of roles) {
         const roleChecker = getAuthCheckerForRole(role);
-        logger.debug(`Checking permissions for role ${role}`);
-        if (
-            !roleChecker({
-                root,
-                args,
-                context: loggedInContext,
-                info,
-            })
-        ) {
-            return false;
-        }
-        return true;
-    });
+        // eslint-disable-next-line no-await-in-loop
+        const checkResult = await roleChecker({
+            root, args, context: loggedInContext, info,
+        });
+        if (!checkResult) return false;
+    }
+    return true;
 };
 
 export default authChecker;

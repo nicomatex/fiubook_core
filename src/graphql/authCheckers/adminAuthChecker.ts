@@ -3,6 +3,6 @@ import { ResolverData } from 'type-graphql';
 
 const AdminAuthChecker = ({
     context,
-}: ResolverData<LoggedInContextType>): boolean => context.isAdmin;
+}: ResolverData<LoggedInContextType>): Promise<boolean> => Promise.resolve(context.isAdmin);
 
 export default AdminAuthChecker;

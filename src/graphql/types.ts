@@ -42,7 +42,7 @@ type RoleChecker = ({
     args,
     context,
     info,
-}: ResolverData<LoggedInContextType>) => boolean
+}: ResolverData<LoggedInContextType>) => Promise<boolean>
 
 @InputType()
 class Credentials {
@@ -54,7 +54,7 @@ class Credentials {
     @MaxLength(128)
         password!: string;
 }
-type RoleTypes = 'ADMIN' | 'STUDENT' | 'PROFESSOR' | 'NODO' | 'PUBLISHER'
+type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
 
 enum BookingType{
     AUTOMATIC = 'AUTOMATIC',

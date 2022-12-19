@@ -8,6 +8,7 @@ import {
 import logger from '@util/logger';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
+import { parse } from 'postgres-array';
 
 const connection = knex({ ...config.knex });
 
@@ -57,4 +58,20 @@ const getServicesByPublisherId = async (userId: string, paginationToken?: string
 
     return genPaginatedResponse(data, config.pagination.pageSize, PaginatedQueryType.Services);
 };
-export default { addService, getServices, getServicesByPublisherId };
+
+const getServiceById = async (serviceId: string) => {
+    const query = connection('services')
+        .where({ id: serviceId });
+
+    const data = await query;
+    if (data.length === 0) throw new Error(`Service with id ${serviceId} not found`);
+    const service = data[0];
+
+    service.allowed_roles = parse(service.allowed_roles);
+
+    return service;
+};
+
+export default {
+    addService, getServices, getServicesByPublisherId, getServiceById,
+};

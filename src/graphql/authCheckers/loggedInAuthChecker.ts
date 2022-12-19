@@ -3,6 +3,6 @@ import { ResolverData } from 'type-graphql';
 
 const LoggedInAuthChecker = ({
     context,
-}: ResolverData<ContextType>): boolean => context.isLoggedIn;
+}: ResolverData<ContextType>): Promise<boolean> => Promise.resolve(context.isLoggedIn);
 
 export default LoggedInAuthChecker;

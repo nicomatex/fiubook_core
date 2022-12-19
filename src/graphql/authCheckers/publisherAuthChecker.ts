@@ -4,9 +4,9 @@ import { ResolverData } from 'type-graphql';
 
 const PublisherAuthChecker = ({
     context,
-}: ResolverData<LoggedInContextType>): boolean => {
+}: ResolverData<LoggedInContextType>): Promise<boolean> => {
     logger.debug(`User can publish: ${context.canPublishServices}`);
-    return context.canPublishServices;
+    return Promise.resolve(context.canPublishServices);
 };
 
 export default PublisherAuthChecker;
