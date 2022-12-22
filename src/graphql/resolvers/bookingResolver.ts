@@ -9,6 +9,7 @@ import { LoggedInContextType } from '@graphql/types';
 import { Booking, CreateBookingArgs } from '@graphql/schemas/booking';
 import serviceRepository from '@repositories/serviceRepository';
 import bookingRepository from '@repositories/bookingRepository';
+import { Service } from '@graphql/schemas/service';
 
 @Resolver()
 class BookingResolver {
@@ -38,6 +39,26 @@ class BookingResolver {
         );
 
         return insertedBooking;
+    }
+
+    @Authorized()
+    async getConflictingBookings(
+        @Arg('service_id') serviceId: string,
+        @Arg('start_date') startDate: Date,
+        @Arg('end_date') endDate: Date,
+        @Ctx() ctx: LoggedInContextType,
+    ): Promise<Service[]> {
+        if (endDate <= startDate) {
+            throw new Error('End date cannot be equal or earlier than start date');
+        }
+
+        const conflictingBookings = await bookingRepository.getConflictingBookings(
+            serviceId,
+            startDate,
+            endDate,
+        );
+
+        return conflictingBookings;
     }
 }
 
