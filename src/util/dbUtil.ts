@@ -53,9 +53,13 @@ const decodePaginationToken = (
     return data;
 };
 
-const withPaginationToken = (queryBuilder: Knex.QueryBuilder, paginationToken?: string) => {
+const withPaginationToken = (
+    queryBuilder: Knex.QueryBuilder,
+    paginationTokenType: PaginatedQueryType,
+    paginationToken?: string,
+) => {
     if (paginationToken === undefined) return;
-    const paginationInfo = decodePaginationToken(paginationToken, PaginatedQueryType.Services);
+    const paginationInfo = decodePaginationToken(paginationToken, paginationTokenType);
     const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
     queryBuilder.whereRaw(`(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`);
 };

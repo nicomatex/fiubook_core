@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateBookingArgs } from '@graphql/schemas/booking';
 import knex from 'knex';
 import { Service } from '@graphql/schemas/service';
-import { request } from 'express';
+import { genPaginatedResponse, PaginatedQueryType, withPaginationToken } from '@util/dbUtil';
+import adaptBooking from '@repositories/dataAdapters/bookingDataAdapter';
 
 const connection = knex({ ...config.knex });
 
@@ -27,12 +28,23 @@ const getConflictingBookings = async (
 
 const getBookingsByRequestorId = async (
     requestorId: string,
+    paginationToken?: string,
 ) => {
     const query = connection('bookings')
-        .where({ requestor_id: requestorId });
+        .where({ requestor_id: requestorId })
+        .orderBy('ts')
+        .orderBy('id')
+        .modify(withPaginationToken, PaginatedQueryType.Bookings, paginationToken)
+        .limit(config.pagination.pageSize);
 
-    const res = await query;
-    return res;
+    const data = await query;
+    const parsedData = data.map(adaptBooking);
+
+    return genPaginatedResponse(
+        parsedData,
+        config.pagination.pageSize,
+        PaginatedQueryType.Bookings,
+    );
 };
 
 const createBooking = async (

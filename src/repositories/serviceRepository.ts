@@ -36,7 +36,7 @@ const getServices = async (
     const query = connection('services')
         .orderBy('ts')
         .orderBy('id')
-        .modify(withPaginationToken, paginationToken)
+        .modify(withPaginationToken, PaginatedQueryType.Services, paginationToken)
         .modify(withQueryTerm, 'search_index', queryTerm)
         .limit(config.pagination.pageSize);
 
@@ -56,7 +56,7 @@ const getServicesByPublisherId = async (userId: string, paginationToken?: string
         .where({ publisher_id: userId })
         .orderBy('ts')
         .orderBy('id')
-        .modify(withPaginationToken, paginationToken)
+        .modify(withPaginationToken, PaginatedQueryType.Services, paginationToken)
         .limit(config.pagination.pageSize);
 
     const data = await query;

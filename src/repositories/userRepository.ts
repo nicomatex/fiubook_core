@@ -53,7 +53,7 @@ const getUsers = async (
     const query = connection('users')
         .orderBy('ts')
         .orderBy('id')
-        .modify(withPaginationToken, paginationToken)
+        .modify(withPaginationToken, PaginatedQueryType.Users, paginationToken)
         .limit(config.pagination.pageSize);
 
     const data = await query;

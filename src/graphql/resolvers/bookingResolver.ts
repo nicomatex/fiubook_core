@@ -3,10 +3,10 @@ import {
     Arg,
     Authorized,
     Ctx,
-    Mutation, Resolver,
+    Mutation, Query, Resolver,
 } from 'type-graphql';
 import { LoggedInContextType } from '@graphql/types';
-import { Booking, CreateBookingArgs } from '@graphql/schemas/booking';
+import { Booking, CreateBookingArgs, PaginatedBookingResponse } from '@graphql/schemas/booking';
 import serviceRepository from '@repositories/serviceRepository';
 import bookingRepository from '@repositories/bookingRepository';
 import { Service } from '@graphql/schemas/service';
@@ -16,7 +16,7 @@ class BookingResolver {
     @Authorized(['BOOKING_ROLES'])
     @Mutation(() => Booking)
     async createBooking(@Arg('creationArgs') creationArgs: CreateBookingArgs, @Ctx() ctx: LoggedInContextType)
-    : Promise<{id:String}> {
+    : Promise<Booking> {
         if (creationArgs.end_date <= creationArgs.start_date) {
             throw new Error('End date cannot be equal or earlier than start date');
         }
@@ -42,11 +42,10 @@ class BookingResolver {
     }
 
     @Authorized()
-    async getConflictingBookings(
+    async conflictingBookings(
         @Arg('service_id') serviceId: string,
         @Arg('start_date') startDate: Date,
         @Arg('end_date') endDate: Date,
-        @Ctx() ctx: LoggedInContextType,
     ): Promise<Service[]> {
         if (endDate <= startDate) {
             throw new Error('End date cannot be equal or earlier than start date');
@@ -59,6 +58,24 @@ class BookingResolver {
         );
 
         return conflictingBookings;
+    }
+
+    @Query(() => PaginatedBookingResponse)
+    @Authorized()
+    async myBookings(
+        @Ctx() ctx: LoggedInContextType,
+        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+    ) {
+        const res = await bookingRepository.getBookingsByRequestorId(ctx.userId, paginationToken);
+        return res;
+    }
+
+    @Mutation(() => Boolean)
+    async cancelBooking(
+        @Arg('booking_id') bookingId: string,
+    ): Promise<Boolean> {
+        // TODO: Pending implementation
+        return true;
     }
 }
 
