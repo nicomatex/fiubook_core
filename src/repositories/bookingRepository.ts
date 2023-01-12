@@ -67,4 +67,33 @@ const createBooking = async (
     return insertedBooking;
 };
 
-export default { getConflictingBookings, getBookingsByRequestorId, createBooking };
+const getBookingById = async (
+    id: string,
+) => {
+    const query = connection('bookings')
+        .where({ id });
+
+    const data = await query;
+    if (data.length === 0) throw new Error(`Booking with id ${id} not found`);
+    const booking = data[0];
+
+    const parsedBooking = adaptBooking(booking);
+
+    return parsedBooking;
+};
+
+const deleteBookingById = async (
+    id: string,
+) => {
+    const query = connection('bookings').where({ id }).del();
+    const res = await query;
+    return res >= 1;
+};
+
+export default {
+    getConflictingBookings,
+    getBookingsByRequestorId,
+    createBooking,
+    getBookingById,
+    deleteBookingById,
+};

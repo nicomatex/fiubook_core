@@ -71,11 +71,20 @@ class BookingResolver {
     }
 
     @Mutation(() => Boolean)
+    @Authorized()
     async cancelBooking(
         @Arg('booking_id') bookingId: string,
+        @Ctx() ctx: LoggedInContextType,
     ): Promise<Boolean> {
-        // TODO: Pending implementation
-        return true;
+        const booking = await bookingRepository.getBookingById(bookingId);
+
+        // Both the publisher and the requestor may cancel
+        if (booking.requestor_id !== ctx.userId && booking.publisher_id !== ctx.userId) {
+            throw new Error('You are not authorized for this action.');
+        }
+
+        const res = await bookingRepository.deleteBookingById(bookingId);
+        return res;
     }
 }
 
