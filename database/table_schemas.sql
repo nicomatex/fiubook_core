@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS services(
 		publisher_id CHAR(36) REFERENCES users(id),
         name VARCHAR(128) NOT NULL,
         description VARCHAR(512),
-        granularity INTERVAL NOT NULL,
+        granularity INTEGER NOT NULL,
         min_time INTEGER NOT NULL DEFAULT '1',
         max_time INTEGER,
         booking_type BOOKING_TYPE NOT NULL,

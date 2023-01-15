@@ -55,8 +55,8 @@ class Service {
     @Field(() => String)
         description!: string;
 
-    @Field(() => String, { description: 'Time slot granularity in ISO String format' })
-        granularity!: string;
+    @Field(() => Int, { description: 'Time slot granularity in seconds' })
+        granularity!: number;
 
     @Field(() => Int, { description: 'Minimum amount of time slots to reserve' })
         min_time!: number;

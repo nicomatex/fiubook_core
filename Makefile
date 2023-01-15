@@ -43,3 +43,9 @@ reload: push
 restart: 
 	kubectl rollout restart deployment fiubook-core-deployment
 .PHONY: restart
+
+reload_config:
+	@echo "Reapplying core config"
+	kubectl apply -f ./kube_templates/core-config.yml
+	kubectl rollout restart deployment fiubook-core-deployment
+.PHONY: reload_config

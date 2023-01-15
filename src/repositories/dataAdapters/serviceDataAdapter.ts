@@ -13,7 +13,7 @@ export type RawService = {
     publisher_id: string,
     name: string,
     description: string,
-    granularity: PostgresInterval,
+    granularity: number,
     min_time: number,
     max_time: number,
     booking_type: string,
@@ -22,7 +22,6 @@ export type RawService = {
 
 const adapt = (rawService: RawService): Service => ({
     ...rawService,
-    granularity: rawService.granularity.toISO(),
     allowed_roles: parse(rawService.allowed_roles) as UniversityRole[],
     booking_type: rawService.booking_type as BookingType,
 });

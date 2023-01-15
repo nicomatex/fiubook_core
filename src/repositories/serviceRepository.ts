@@ -19,7 +19,6 @@ Promise<Service> => {
         ...creationArgs,
         id,
         publisher_id: publisherId,
-        granularity: { seconds: creationArgs.granularity },
     };
 
     const insertionResult = await connection('services').insert(newService).returning('*');
