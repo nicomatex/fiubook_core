@@ -102,10 +102,28 @@ const deleteBookingById = async (id: string) => {
     return res >= 1;
 };
 
+const updateBookingStatusById = async (
+    id: string,
+    newStatus: BookingStatus,
+) => {
+    const query = connection('bookings')
+        .where({ id })
+        .update({ booking_status: newStatus })
+        .returning('*');
+    const data = await query;
+    if (data.length === 0) throw new Error(`Booking with id ${id} not found`);
+
+    const modifiedBooking = data[0];
+
+    const parsedBooking = adaptBooking(modifiedBooking);
+    return parsedBooking;
+};
+
 export default {
     getConflictingBookings,
     getBookingsByRequestorId,
     createBooking,
     getBookingById,
     deleteBookingById,
+    updateBookingStatusById,
 };
