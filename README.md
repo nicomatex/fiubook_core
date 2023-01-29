@@ -17,3 +17,6 @@
 2. Run `make bootstrap_cluster`
 
 3. To access the cluster from the host machine, you should open a terminal and run `minikube tunnel`, and do not close it.
+
+
+[Link to design document](https://docs.google.com/document/d/1E47VkvhY0L77N5DmNpXWNVSmEmn4XE_PP-RnZ7xKpCM/edit)
