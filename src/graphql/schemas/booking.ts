@@ -1,9 +1,8 @@
 import {
-    ArgsType,
-    Field, ID, InputType, Int, ObjectType,
+    Field, ID, InputType, ObjectType,
 } from 'type-graphql';
 
-import { PaginatedResponse } from '@graphql/types';
+import { BookingStatus, PaginatedResponse } from '@graphql/types';
 
 @InputType()
 export class CreateBookingArgs {
@@ -41,7 +40,7 @@ class Booking {
         end_date!: Date;
 
     @Field()
-        is_confirmed!: boolean;
+        booking_status!: BookingStatus;
 }
 
 @ObjectType()

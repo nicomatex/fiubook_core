@@ -21,6 +21,12 @@ enum UniversityRole{
     NODO = 'NODO',
 }
 
+enum BookingStatus{
+    PENDING_CONFIRMATION = 'PENDING_CONFIRMATION',
+    CONFIRMED = 'CONFIRMED',
+    CANCELLED = 'CANCELLED'
+}
+
 function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
     @ObjectType({ isAbstract: true })
@@ -79,8 +85,13 @@ registerEnumType(UniversityRole, {
     description: 'Unversity role. STUDENT, PROFESSOR or NODO',
 });
 
+registerEnumType(BookingStatus, {
+    name: 'BookingStatus',
+    description: 'Booking Status. CONFIRMED, PENDING_CONFIRMATION or CANCELLED',
+});
+
 export {
     PaginatedResponse, ContextType, Credentials, RoleChecker,
     RoleTypes, LoggedInContextType, NotLoggedInContextType,
-    BookingType, UniversityRole,
+    BookingType, UniversityRole, BookingStatus,
 };
