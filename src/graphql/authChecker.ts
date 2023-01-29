@@ -1,6 +1,9 @@
 import { AuthChecker } from 'type-graphql';
 import {
-    ContextType, LoggedInContextType, RoleChecker, RoleTypes,
+    ContextType,
+    LoggedInContextType,
+    RoleChecker,
+    RoleTypes,
 } from '@graphql/types';
 import LoggedInAuthChecker from '@graphql/authCheckers/loggedInAuthChecker';
 import PublisherAuthChecker from '@graphql/authCheckers/publisherAuthChecker';
@@ -29,14 +32,16 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
 ) => {
     // Always check if user is logged in
     if (
-        !LoggedInAuthChecker({
+        !(await LoggedInAuthChecker({
             root,
             args,
             context,
             info,
-        })
-    ) { return false; }
-
+        }))
+    ) {
+        return false;
+    }
+    logger.debug('User deemed as logged in.');
     const loggedInContext = context as LoggedInContextType;
 
     // Check any other necessary roles
@@ -45,7 +50,10 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
         const roleChecker = getAuthCheckerForRole(role);
         // eslint-disable-next-line no-await-in-loop
         const checkResult = await roleChecker({
-            root, args, context: loggedInContext, info,
+            root,
+            args,
+            context: loggedInContext,
+            info,
         });
         if (!checkResult) return false;
     }

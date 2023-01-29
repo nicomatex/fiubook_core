@@ -10,6 +10,7 @@ import {
 } from '@util/dbUtil';
 import adaptBooking from '@repositories/dataAdapters/bookingDataAdapter';
 import { BookingStatus } from '@graphql/types';
+import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
 
@@ -46,6 +47,32 @@ const getBookingsByRequestorId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
+        )
+        .limit(config.pagination.pageSize);
+
+    const data = await query;
+    const parsedData = data.map(adaptBooking);
+
+    return genPaginatedResponse(
+        parsedData,
+        config.pagination.pageSize,
+        PaginatedQueryType.Bookings,
+    );
+};
+
+const getBookingsByPublisherId = async (
+    publisherId: string,
+    paginationToken?: string,
+) => {
+    const query = connection('bookings')
+        .where({ publisher_id: publisherId })
+        .orderBy('ts', 'desc')
+        .orderBy('id', 'desc')
+        .modify(
+            withPaginationToken,
+            PaginatedQueryType.Bookings,
+            paginationToken,
+            true,
         )
         .limit(config.pagination.pageSize);
 
@@ -122,6 +149,7 @@ const updateBookingStatusById = async (
 export default {
     getConflictingBookings,
     getBookingsByRequestorId,
+    getBookingsByPublisherId,
     createBooking,
     getBookingById,
     deleteBookingById,

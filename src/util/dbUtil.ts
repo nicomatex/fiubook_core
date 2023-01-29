@@ -21,7 +21,7 @@ type PaginationTokenPayload = {
 }
 
 // Add new paginable data types here
-type PaginableDataType = Service | User;
+type PaginableDataType = Service | User
 
 const genPaginationToken = (
     id: string,
@@ -57,16 +57,31 @@ const withPaginationToken = (
     queryBuilder: Knex.QueryBuilder,
     paginationTokenType: PaginatedQueryType,
     paginationToken?: string,
+    dateOrderingDesc?: boolean,
 ) => {
     if (paginationToken === undefined) return;
-    const paginationInfo = decodePaginationToken(paginationToken, paginationTokenType);
+    const paginationInfo = decodePaginationToken(
+        paginationToken,
+        paginationTokenType,
+    );
     const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
-    queryBuilder.whereRaw(`(ts, id) > ('${previousPageLastTs}','${previousPageLastId}')`);
+    queryBuilder.whereRaw(
+        `(ts, id) ${
+            dateOrderingDesc ? '<' : '>'
+        } ('${previousPageLastTs}','${previousPageLastId}')`,
+    );
 };
 
-const withQueryTerm = (queryBuilder: Knex.QueryBuilder, tsColumn: string, queryTerm?: string) => {
+const withQueryTerm = (
+    queryBuilder: Knex.QueryBuilder,
+    tsColumn: string,
+    queryTerm?: string,
+) => {
     if (queryTerm === undefined) return;
-    queryBuilder.whereRaw('?? @@ to_tsquery(\'spanish\',?)', [tsColumn, queryEscaper(queryTerm)]);
+    queryBuilder.whereRaw("?? @@ to_tsquery('spanish',?)", [
+        tsColumn,
+        queryEscaper(queryTerm),
+    ]);
 };
 
 const genPaginatedResponse = <T extends PaginableDataType>(
@@ -93,7 +108,10 @@ const genPaginatedResponse = <T extends PaginableDataType>(
 };
 
 export {
-    genPaginationToken, decodePaginationToken,
-    PaginatedQueryType, withPaginationToken, withQueryTerm,
+    genPaginationToken,
+    decodePaginationToken,
+    PaginatedQueryType,
+    withPaginationToken,
+    withQueryTerm,
     genPaginatedResponse,
 };

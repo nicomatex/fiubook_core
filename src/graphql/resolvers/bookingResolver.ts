@@ -11,6 +11,7 @@ import {
 import serviceRepository from '@repositories/serviceRepository';
 import bookingRepository from '@repositories/bookingRepository';
 import { Service } from '@graphql/schemas/service';
+import logger from '@util/logger';
 
 @Resolver()
 class BookingResolver {
@@ -103,6 +104,19 @@ class BookingResolver {
         const res = await bookingRepository.updateBookingStatusById(
             bookingId,
             BookingStatus.CANCELLED,
+        );
+        return res;
+    }
+
+    @Query(() => PaginatedBookingResponse)
+    @Authorized()
+    async myBookingsForPublisher(
+        @Ctx() ctx: LoggedInContextType,
+        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+    ) {
+        const res = await bookingRepository.getBookingsByPublisherId(
+            ctx.userId,
+            paginationToken,
         );
         return res;
     }
