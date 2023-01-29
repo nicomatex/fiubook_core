@@ -1,4 +1,5 @@
 import { Booking } from '@graphql/schemas/booking';
+import { BookingStatus } from '@graphql/types';
 
 export type RawBooking = {
     id: string,
@@ -8,7 +9,7 @@ export type RawBooking = {
     publisher_id: string,
     start_date: Date,
     end_date: Date,
-    is_confirmed: boolean,
+    booking_status: BookingStatus,
 }
 
 const adapt = (rawBooking: RawBooking): Booking => ({
