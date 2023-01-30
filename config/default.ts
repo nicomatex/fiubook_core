@@ -4,8 +4,12 @@ const listeningPort = parseInt(process.env.LISTENING_PORT ?? '3000', 10);
 
 const config = {
     server: {
+        cors: {
+            allowedOrigins: 'http://localhost:8080',
+        },
         port: listeningPort,
     },
+
     knex: {
         client: 'pg',
         connection: {
