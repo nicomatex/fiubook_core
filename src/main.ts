@@ -7,7 +7,7 @@ import logger from '@util/logger';
 import config from '@config/default';
 import cors from 'cors';
 
-const allowedOrigins = config.server.cors.allowedOrigins;
+const { allowedOrigins } = config.server.cors;
 
 const options: cors.CorsOptions = {
     origin: allowedOrigins,
