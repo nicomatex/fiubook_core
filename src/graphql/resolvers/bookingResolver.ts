@@ -20,6 +20,9 @@ class BookingResolver {
         @Arg('creationArgs') creationArgs: CreateBookingArgs,
         @Ctx() ctx: LoggedInContextType,
     ): Promise<Booking> {
+        if (creationArgs.start_date.getTime() < Date.now()) {
+            throw new Error('Start date cannot be in the past.');
+        }
         if (creationArgs.end_date <= creationArgs.start_date) {
             throw new Error(
                 'End date cannot be equal or earlier than start date',
