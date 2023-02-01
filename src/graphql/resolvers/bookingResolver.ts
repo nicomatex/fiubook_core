@@ -11,7 +11,6 @@ import {
 import serviceRepository from '@repositories/serviceRepository';
 import bookingRepository from '@repositories/bookingRepository';
 import { Service } from '@graphql/schemas/service';
-import logger from '@util/logger';
 
 @Resolver()
 class BookingResolver {
@@ -118,6 +117,32 @@ class BookingResolver {
             ctx.userId,
             paginationToken,
         );
+        return res;
+    }
+
+    @Mutation(() => Booking)
+    @Authorized()
+    async acceptBooking(
+        @Arg('booking_id') bookingId: string,
+        @Arg('accept') accept: boolean,
+        @Ctx() ctx: LoggedInContextType,
+    ) {
+        const booking = await bookingRepository.getBookingById(bookingId);
+        if (booking.publisher_id !== ctx.userId) {
+            throw new Error('You are not authorized for this action.');
+        }
+
+        if (booking.booking_status !== BookingStatus.PENDING_CONFIRMATION) {
+            throw new Error(
+                `Booking with id ${bookingId} is not in pending confirmation state.`,
+            );
+        }
+
+        const res = await bookingRepository.updateBookingStatusById(
+            bookingId,
+            accept ? BookingStatus.CONFIRMED : BookingStatus.CANCELLED,
+        );
+
         return res;
     }
 }
