@@ -3,6 +3,7 @@ import {
     CreateServiceArgs,
     PaginatedServiceResponse,
     Service,
+    UpdateServiceArgs,
 } from '@graphql/schemas/service';
 import {
     Arg,
@@ -65,6 +66,24 @@ class ServiceResolver {
             ctx.userId,
             paginationToken,
             pageSize,
+        );
+        return res;
+    }
+
+    @Mutation(() => Service)
+    @Authorized()
+    async updateService(
+        @Arg('service_id') serviceId: string,
+        @Arg('updateArgs') updateArgs: UpdateServiceArgs,
+        @Ctx() ctx: LoggedInContextType,
+    ) {
+        const service = await serviceRepository.getServiceById(serviceId);
+        if (service.publisher_id !== ctx.userId) {
+            throw new Error('You are not the publisher of this service');
+        }
+        const res = await serviceRepository.updateServiceById(
+            serviceId,
+            updateArgs,
         );
         return res;
     }
