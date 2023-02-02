@@ -79,10 +79,12 @@ class BookingResolver {
     async myBookings(
         @Ctx() ctx: LoggedInContextType,
         @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('page_size', { nullable: true }) pageSize?: number,
     ) {
         const res = await bookingRepository.getBookingsByRequestorId(
             ctx.userId,
             paginationToken,
+            pageSize,
         );
         return res;
     }
@@ -115,10 +117,12 @@ class BookingResolver {
     async myBookingsForPublisher(
         @Ctx() ctx: LoggedInContextType,
         @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('page_size', { nullable: true }) pageSize?: number,
     ) {
         const res = await bookingRepository.getBookingsByPublisherId(
             ctx.userId,
             paginationToken,
+            pageSize,
         );
         return res;
     }
