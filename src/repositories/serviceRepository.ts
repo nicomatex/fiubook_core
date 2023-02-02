@@ -3,6 +3,7 @@ import {
     CreateServiceArgs,
     PaginatedServiceResponse,
     Service,
+    UpdateServiceArgs,
 } from '@graphql/schemas/service';
 import {
     genPaginatedResponse,
@@ -103,9 +104,28 @@ const getServiceById = async (serviceId: string) => {
     return parsedService;
 };
 
+const updateServiceById = async (
+    serviceId: string,
+    updateArgs: UpdateServiceArgs,
+) => {
+    const query = connection('services')
+        .where({ id: serviceId })
+        .update(updateArgs)
+        .returning('*');
+
+    const data = await query;
+    if (data.length === 0) throw new Error(`Service with id ${serviceId} not found`);
+    const service = data[0];
+
+    const parsedService = adaptService(service);
+
+    return parsedService;
+};
+
 export default {
     addService,
     getServices,
     getServicesByPublisherId,
     getServiceById,
+    updateServiceById,
 };

@@ -28,6 +28,30 @@ export class CreateServiceArgs {
         allowed_roles!: UniversityRole[];
 }
 
+@InputType()
+export class UpdateServiceArgs {
+    @Field(() => String, { nullable: true })
+        name?: string;
+
+    @Field(() => String, { nullable: true })
+        description?: string;
+
+    @Field(() => Int, { nullable: true })
+        granularity?: number;
+
+    @Field(() => Int, { nullable: true })
+        min_time?: number;
+
+    @Field(() => Int, { nullable: true })
+        max_time?: number;
+
+    @Field(() => BookingType, { nullable: true })
+        booking_type?: BookingType;
+
+    @Field(() => [UniversityRole], { nullable: true })
+        allowed_roles?: UniversityRole[];
+}
+
 @ObjectType()
 class Service {
     @Field()
