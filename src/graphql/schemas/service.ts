@@ -1,18 +1,8 @@
 import {
-    ArgsType,
-    Field, ID, InputType, Int, ObjectType,
+    ArgsType, Field, ID, InputType, Int, ObjectType,
 } from 'type-graphql';
 
 import { BookingType, PaginatedResponse, UniversityRole } from '@graphql/types';
-
-@ArgsType()
-class GetServicesArgs {
-    @Field({ nullable: true })
-        pagination_token?: string;
-
-    @Field(() => String, { nullable: true })
-        query_term?: string;
-}
 
 @InputType()
 export class CreateServiceArgs {
@@ -58,10 +48,15 @@ class Service {
     @Field(() => Int, { description: 'Time slot granularity in seconds' })
         granularity!: number;
 
-    @Field(() => Int, { description: 'Minimum amount of time slots to reserve' })
+    @Field(() => Int, {
+        description: 'Minimum amount of time slots to reserve',
+    })
         min_time!: number;
 
-    @Field(() => Int, { description: 'Maximum amount of time slots to reserve', nullable: true })
+    @Field(() => Int, {
+        description: 'Maximum amount of time slots to reserve',
+        nullable: true,
+    })
         max_time?: number;
 
     @Field(() => BookingType)
@@ -74,4 +69,4 @@ class Service {
 @ObjectType()
 class PaginatedServiceResponse extends PaginatedResponse(Service) {}
 
-export { Service, PaginatedServiceResponse, GetServicesArgs };
+export { Service, PaginatedServiceResponse };

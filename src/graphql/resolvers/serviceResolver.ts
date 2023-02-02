@@ -1,13 +1,17 @@
 /* eslint-disable class-methods-use-this */
 import {
-    CreateServiceArgs, GetServicesArgs, PaginatedServiceResponse, Service,
+    CreateServiceArgs,
+    PaginatedServiceResponse,
+    Service,
 } from '@graphql/schemas/service';
 import {
     Arg,
     Args,
     Authorized,
     Ctx,
-    Mutation, Query, Resolver,
+    Mutation,
+    Query,
+    Resolver,
 } from 'type-graphql';
 import serviceRepository from '@repositories/serviceRepository';
 import { LoggedInContextType } from '@graphql/types';
@@ -16,10 +20,15 @@ import { LoggedInContextType } from '@graphql/types';
 class ServiceResolver {
     @Authorized(['PUBLISHER'])
     @Mutation(() => Service)
-    async createService(@Arg('creationArgs') creationArgs: CreateServiceArgs, @Ctx() ctx: LoggedInContextType)
-    : Promise<Service> {
+    async createService(
+        @Arg('creationArgs') creationArgs: CreateServiceArgs,
+        @Ctx() ctx: LoggedInContextType,
+    ): Promise<Service> {
         try {
-            const res = await serviceRepository.addService(creationArgs, ctx.userId);
+            const res = await serviceRepository.addService(
+                creationArgs,
+                ctx.userId,
+            );
             return res;
         } catch (err: any) {
             if (err.code === '23505') {
@@ -31,21 +40,32 @@ class ServiceResolver {
 
     @Query(() => PaginatedServiceResponse)
     @Authorized()
-    async services(@Args()
-        { pagination_token: paginationToken, query_term: queryTerm }:
-    GetServicesArgs) {
-        const res = await serviceRepository.getServices(paginationToken, queryTerm);
+    async services(
+        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('query_term', { nullable: true }) queryTerm?: string,
+        @Arg('page_size', { nullable: true }) pageSize?: number,
+    ) {
+        const res = await serviceRepository.getServices(
+            paginationToken,
+            queryTerm,
+            pageSize,
+        );
         return res;
     }
 
     @Query(() => PaginatedServiceResponse)
     @Authorized()
     async myServices(
-        @Args()
-            { pagination_token: paginationToken }: GetServicesArgs,
         @Ctx() ctx: LoggedInContextType,
+        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('query_term', { nullable: true }) queryTerm?: string,
+        @Arg('page_size', { nullable: true }) pageSize?: number,
     ) {
-        const res = await serviceRepository.getServicesByPublisherId(ctx.userId, paginationToken);
+        const res = await serviceRepository.getServicesByPublisherId(
+            ctx.userId,
+            paginationToken,
+            pageSize,
+        );
         return res;
     }
 }

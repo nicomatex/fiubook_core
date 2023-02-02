@@ -3,7 +3,9 @@ import { PaginatedUserResponse, User } from '@graphql/schemas/user';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import {
-    genPaginatedResponse, PaginatedQueryType, withPaginationToken,
+    genPaginatedResponse,
+    PaginatedQueryType,
+    withPaginationToken,
 } from '@util/dbUtil';
 import adaptUser from '@repositories/dataAdapters/userDataAdapter';
 
@@ -29,7 +31,7 @@ const addUser = async (dni: string): Promise<User> => {
     return parsedInsertedUser;
 };
 
-const getUserByDNI = async (dni: string): Promise<User|null> => {
+const getUserByDNI = async (dni: string): Promise<User | null> => {
     const res = await connection('users').where({ dni });
     if (res.length === 0) return null;
     const user = res[0];
@@ -49,20 +51,28 @@ const getUserById = async (id: string): Promise<User> => {
 
 const getUsers = async (
     paginationToken?: string,
+    pageSize?: number,
 ): Promise<PaginatedUserResponse> => {
     const query = connection('users')
         .orderBy('ts')
         .orderBy('id')
         .modify(withPaginationToken, PaginatedQueryType.Users, paginationToken)
-        .limit(config.pagination.pageSize);
+        .limit(pageSize ?? config.pagination.pageSize);
 
     const data = await query;
 
     const parsedData = data.map(adaptUser);
 
-    return genPaginatedResponse(parsedData, config.pagination.pageSize, PaginatedQueryType.Users);
+    return genPaginatedResponse(
+        parsedData,
+        pageSize ?? config.pagination.pageSize,
+        PaginatedQueryType.Users,
+    );
 };
 
 export default {
-    addUser, getUserByDNI, getUserById, getUsers,
+    addUser,
+    getUserByDNI,
+    getUserById,
+    getUsers,
 };

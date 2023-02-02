@@ -2,17 +2,14 @@
 /* eslint-disable max-classes-per-file */
 import {
     Arg,
-    Args,
-    ArgsType,
     Authorized,
-    Field,
     Mutation,
     Query,
     Resolver,
     UseMiddleware,
 } from 'type-graphql';
 
-import { GetUsersArgs, PaginatedUserResponse, User } from '@graphql/schemas/user';
+import { PaginatedUserResponse, User } from '@graphql/schemas/user';
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials } from '@graphql/types';
@@ -38,8 +35,11 @@ class UserResolver {
 
     @Query(() => PaginatedUserResponse)
     @Authorized(['ADMIN'])
-    async users(@Args() { pagination_token: paginationToken }: GetUsersArgs) {
-        const res = await userRepository.getUsers(paginationToken);
+    async users(
+        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('page_size', { nullable: true }) pageSize?: number,
+    ) {
+        const res = await userRepository.getUsers(paginationToken, pageSize);
         return res;
     }
 

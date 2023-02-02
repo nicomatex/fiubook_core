@@ -4,12 +4,6 @@ import {
     ArgsType, Field, ID, ObjectType,
 } from 'type-graphql';
 
-@ArgsType()
-class GetUsersArgs {
-    @Field({ nullable: true })
-        pagination_token?: string;
-}
-
 @ObjectType()
 class User {
     @Field(() => ID)
@@ -33,4 +27,4 @@ class User {
 @ObjectType()
 class PaginatedUserResponse extends PaginatedResponse(User) {}
 
-export { User, PaginatedUserResponse, GetUsersArgs };
+export { User, PaginatedUserResponse };
