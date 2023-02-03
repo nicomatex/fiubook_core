@@ -1,8 +1,17 @@
 /* eslint-disable max-classes-per-file */
 import { PaginatedResponse } from '@graphql/types';
 import {
-    ArgsType, Field, ID, ObjectType,
+    ArgsType, Field, ID, InputType, ObjectType,
 } from 'type-graphql';
+
+@InputType()
+export class UpdateUserArgs {
+    @Field(() => Boolean, { nullable: true })
+        is_admin?: boolean;
+
+    @Field(() => Boolean, { nullable: true })
+        can_publish_services?: boolean;
+}
 
 @ObjectType()
 class User {

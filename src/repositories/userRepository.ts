@@ -1,5 +1,9 @@
 import config from '@config/default';
-import { PaginatedUserResponse, User } from '@graphql/schemas/user';
+import {
+    PaginatedUserResponse,
+    UpdateUserArgs,
+    User,
+} from '@graphql/schemas/user';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -70,10 +74,10 @@ const getUsers = async (
     );
 };
 
-const updateAdminStatusByUserId = async (userId: string, isAdmin: boolean) => {
+const updateUserById = async (userId: string, updateArgs: UpdateUserArgs) => {
     const query = connection('users')
         .where({ id: userId })
-        .update({ is_admin: isAdmin })
+        .update(updateArgs)
         .returning('*');
 
     const res = await query;
@@ -90,5 +94,5 @@ export default {
     getUserByDNI,
     getUserById,
     getUsers,
-    updateAdminStatusByUserId,
+    updateUserById,
 };

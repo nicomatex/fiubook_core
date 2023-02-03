@@ -74,7 +74,7 @@ class ServiceResolver {
     @Authorized()
     async updateService(
         @Arg('service_id') serviceId: string,
-        @Arg('updateArgs') updateArgs: UpdateServiceArgs,
+        @Arg('update_args') updateArgs: UpdateServiceArgs,
         @Ctx() ctx: LoggedInContextType,
     ) {
         const service = await serviceRepository.getServiceById(serviceId);

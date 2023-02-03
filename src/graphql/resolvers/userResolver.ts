@@ -9,10 +9,15 @@ import {
     UseMiddleware,
 } from 'type-graphql';
 
-import { PaginatedUserResponse, User } from '@graphql/schemas/user';
+import {
+    PaginatedUserResponse,
+    UpdateUserArgs,
+    User,
+} from '@graphql/schemas/user';
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials } from '@graphql/types';
+import { UpdateServiceArgs } from '@graphql/schemas/service';
 
 @Resolver()
 class UserResolver {
@@ -59,11 +64,11 @@ class UserResolver {
 
     @Mutation(() => User)
     @Authorized(['ADMIN'])
-    async updateAdminStatus(
+    async updateUser(
         @Arg('id') id: string,
-        @Arg('is_admin') isAdmin: boolean,
+        @Arg('update_args') updateArgs: UpdateUserArgs,
     ) {
-        const res = await userRepository.updateAdminStatusByUserId(id, isAdmin);
+        const res = await userRepository.updateUserById(id, updateArgs);
         return res;
     }
 }
