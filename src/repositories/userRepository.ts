@@ -1,5 +1,9 @@
 import config from '@config/default';
-import { PaginatedUserResponse, User } from '@graphql/schemas/user';
+import {
+    PaginatedUserResponse,
+    UpdateUserArgs,
+    User,
+} from '@graphql/schemas/user';
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -70,9 +74,25 @@ const getUsers = async (
     );
 };
 
+const updateUserById = async (userId: string, updateArgs: UpdateUserArgs) => {
+    const query = connection('users')
+        .where({ id: userId })
+        .update(updateArgs)
+        .returning('*');
+
+    const res = await query;
+    if (res.length === 0) throw new Error(`User with id ${userId} not found`);
+    const user = res[0];
+
+    const parsedUser = adaptUser(user);
+
+    return parsedUser;
+};
+
 export default {
     addUser,
     getUserByDNI,
     getUserById,
     getUsers,
+    updateUserById,
 };
