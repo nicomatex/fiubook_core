@@ -56,6 +56,16 @@ class UserResolver {
             throw err;
         }
     }
+
+    @Mutation(() => User)
+    @Authorized(['ADMIN'])
+    async updateAdminStatus(
+        @Arg('id') id: string,
+        @Arg('is_admin') isAdmin: boolean,
+    ) {
+        const res = await userRepository.updateAdminStatusByUserId(id, isAdmin);
+        return res;
+    }
 }
 
 export default UserResolver;

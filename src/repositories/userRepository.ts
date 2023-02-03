@@ -70,9 +70,25 @@ const getUsers = async (
     );
 };
 
+const updateAdminStatusByUserId = async (userId: string, isAdmin: boolean) => {
+    const query = connection('users')
+        .where({ id: userId })
+        .update({ is_admin: isAdmin })
+        .returning('*');
+
+    const res = await query;
+    if (res.length === 0) throw new Error(`User with id ${userId} not found`);
+    const user = res[0];
+
+    const parsedUser = adaptUser(user);
+
+    return parsedUser;
+};
+
 export default {
     addUser,
     getUserByDNI,
     getUserById,
     getUsers,
+    updateAdminStatusByUserId,
 };
