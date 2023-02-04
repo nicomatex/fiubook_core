@@ -1,4 +1,5 @@
 import { MaxLength } from 'class-validator';
+import { TypeInfo } from 'graphql';
 import {
     ClassType,
     Field,
@@ -10,36 +11,49 @@ import {
 
 type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
 
-enum BookingType{
+enum BookingType {
     AUTOMATIC = 'AUTOMATIC',
-    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION'
+    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION',
 }
 
-enum UniversityRole{
+enum UniversityRole {
     STUDENT = 'STUDENT',
     PROFESSOR = 'PROFESSOR',
     NODO = 'NODO',
 }
 
-enum BookingStatus{
+enum BookingStatus {
     PENDING_CONFIRMATION = 'PENDING_CONFIRMATION',
     CONFIRMED = 'CONFIRMED',
-    CANCELLED = 'CANCELLED'
+    CANCELLED = 'CANCELLED',
 }
 
-function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
-    // `isAbstract` decorator option is mandatory to prevent registering in schema
-    @ObjectType({ isAbstract: true })
-    abstract class PaginatedResponseClass {
-        // here we use the runtime argument
-        @Field(() => [TItemClass])
-        // and here the generic type
-            items!: TItem[];
+@ObjectType()
+class PageInfo {
+    @Field()
+        hasNextPage!: boolean;
 
-        @Field({ nullable: true })
-            paginationToken?: string;
+    @Field()
+        hasPreviousPage!: boolean;
+
+    @Field(() => String, { nullable: true })
+        startCursor?: string | null;
+
+    @Field(() => String, { nullable: true })
+        endCursor?: string | null;
+}
+
+function EdgesType<TItem>(itemFieldValue: ClassType<TItem>) {
+    @ObjectType({ isAbstract: true })
+    abstract class EdgesTypeClass {
+        @Field(() => itemFieldValue)
+            node!: TItem;
+
+        @Field()
+            cursor!: String;
     }
-    return PaginatedResponseClass;
+
+    return EdgesTypeClass;
 }
 
 type LoggedInContextType = {
@@ -54,7 +68,7 @@ type NotLoggedInContextType = {
     isLoggedIn: false
 }
 
-type ContextType = LoggedInContextType | NotLoggedInContextType;
+type ContextType = LoggedInContextType | NotLoggedInContextType
 
 type RoleChecker = ({
     root,
@@ -77,7 +91,8 @@ class Credentials {
 // Required to use these enums in Type-GraphQL.
 registerEnumType(BookingType, {
     name: 'BookingType',
-    description: 'Type of reservation. Either REQUIRES_CONFIRMATION or AUTOMATIC',
+    description:
+        'Type of reservation. Either REQUIRES_CONFIRMATION or AUTOMATIC',
 });
 
 registerEnumType(UniversityRole, {
@@ -91,7 +106,15 @@ registerEnumType(BookingStatus, {
 });
 
 export {
-    PaginatedResponse, ContextType, Credentials, RoleChecker,
-    RoleTypes, LoggedInContextType, NotLoggedInContextType,
-    BookingType, UniversityRole, BookingStatus,
+    PageInfo,
+    EdgesType,
+    ContextType,
+    Credentials,
+    RoleChecker,
+    RoleTypes,
+    LoggedInContextType,
+    NotLoggedInContextType,
+    BookingType,
+    UniversityRole,
+    BookingStatus,
 };
