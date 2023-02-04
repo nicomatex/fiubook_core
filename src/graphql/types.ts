@@ -36,11 +36,11 @@ class PageInfo {
     @Field()
         hasPreviousPage!: boolean;
 
-    @Field({ nullable: true })
-        startCursor!: string | null;
+    @Field(() => String, { nullable: true })
+        startCursor?: string | null;
 
-    @Field({ nullable: true })
-        endCursor!: string | null;
+    @Field(() => String, { nullable: true })
+        endCursor?: string | null;
 }
 
 function EdgesType<TItem>(itemFieldValue: ClassType<TItem>) {
