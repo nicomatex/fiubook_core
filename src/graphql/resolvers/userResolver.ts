@@ -17,7 +17,6 @@ import {
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials } from '@graphql/types';
-import { UpdateServiceArgs } from '@graphql/schemas/service';
 
 @Resolver()
 class UserResolver {
@@ -41,8 +40,8 @@ class UserResolver {
     @Query(() => PaginatedUserResponse)
     @Authorized(['ADMIN'])
     async users(
-        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
-        @Arg('page_size', { nullable: true }) pageSize?: number,
+        @Arg('after', { nullable: true }) paginationToken?: string,
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await userRepository.getUsers(paginationToken, pageSize);
         return res;

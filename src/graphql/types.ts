@@ -1,4 +1,5 @@
 import { MaxLength } from 'class-validator';
+import { TypeInfo } from 'graphql';
 import {
     ClassType,
     Field,
@@ -10,34 +11,94 @@ import {
 
 type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
 
-enum BookingType{
+enum BookingType {
     AUTOMATIC = 'AUTOMATIC',
-    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION'
+    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION',
 }
 
-enum UniversityRole{
+enum UniversityRole {
     STUDENT = 'STUDENT',
     PROFESSOR = 'PROFESSOR',
     NODO = 'NODO',
 }
 
-enum BookingStatus{
+enum BookingStatus {
     PENDING_CONFIRMATION = 'PENDING_CONFIRMATION',
     CONFIRMED = 'CONFIRMED',
-    CANCELLED = 'CANCELLED'
+    CANCELLED = 'CANCELLED',
 }
 
-function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
+// function Edge<TItem>(TItemClass: ClassType<TItem>) {
+//     @ObjectType({ isAbstract: true })
+//     abstract class EdgeClass {
+//         @Field()
+//             cursor!: string;
+
+//         @Field(() => TItemClass)
+//             node!: TItem;
+//     }
+//     return EdgeClass;
+// }
+
+// type EdgeType<TItem> = {
+//     cursor: string
+//     node: TItem
+// }
+
+// @ObjectType()
+// class PageInfoType {
+//     hasNextPage!: boolean;
+
+//     hasPreviousPage!: boolean;
+
+//     first!: string | null;
+
+//     last!: string | null;
+// }
+
+// function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
+//     @ObjectType({ isAbstract: true })
+//     abstract class PaginatedResponseClass {
+//         @Field(() => [Edge(TItemClass)])
+//             edges!: EdgeType<TItem>[];
+
+//         @Field(() => PageInfoType)
+//             pageInfo!: PageInfoType;
+//     }
+//     return PaginatedResponseClass;
+// }
+
+@ObjectType()
+class PageInfo {
+    hasNextPage!: boolean;
+
+    hasPreviousPage!: boolean;
+
+    first!: string | null;
+
+    last!: string | null;
+}
+
+function PaginatedResponse<TItemsFieldValue>(
+    itemsFieldValue: ClassType<TItemsFieldValue>,
+) {
+    @ObjectType({ isAbstract: true })
+    abstract class EdgeClass {
+        @Field()
+            cursor!: string;
+
+        @Field(() => itemsFieldValue)
+            node!: TItemsFieldValue;
+    }
+
     // `isAbstract` decorator option is mandatory to prevent registering in schema
     @ObjectType({ isAbstract: true })
     abstract class PaginatedResponseClass {
-        // here we use the runtime argument
-        @Field(() => [TItemClass])
-        // and here the generic type
-            items!: TItem[];
+        @Field(() => [EdgeClass])
+            edges!: EdgeClass[];
 
-        @Field({ nullable: true })
-            paginationToken?: string;
+        @Field(() => PageInfo)
+            pageInfo!: PageInfo;
     }
     return PaginatedResponseClass;
 }
@@ -54,7 +115,7 @@ type NotLoggedInContextType = {
     isLoggedIn: false
 }
 
-type ContextType = LoggedInContextType | NotLoggedInContextType;
+type ContextType = LoggedInContextType | NotLoggedInContextType
 
 type RoleChecker = ({
     root,
@@ -77,7 +138,8 @@ class Credentials {
 // Required to use these enums in Type-GraphQL.
 registerEnumType(BookingType, {
     name: 'BookingType',
-    description: 'Type of reservation. Either REQUIRES_CONFIRMATION or AUTOMATIC',
+    description:
+        'Type of reservation. Either REQUIRES_CONFIRMATION or AUTOMATIC',
 });
 
 registerEnumType(UniversityRole, {
@@ -91,7 +153,14 @@ registerEnumType(BookingStatus, {
 });
 
 export {
-    PaginatedResponse, ContextType, Credentials, RoleChecker,
-    RoleTypes, LoggedInContextType, NotLoggedInContextType,
-    BookingType, UniversityRole, BookingStatus,
+    PaginatedResponse,
+    ContextType,
+    Credentials,
+    RoleChecker,
+    RoleTypes,
+    LoggedInContextType,
+    NotLoggedInContextType,
+    BookingType,
+    UniversityRole,
+    BookingStatus,
 };

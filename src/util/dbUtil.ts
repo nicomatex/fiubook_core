@@ -86,24 +86,24 @@ const withQueryTerm = (
 
 const genPaginatedResponse = <T extends PaginableDataType>(
     data: T[],
-    pageSize: number,
+    last: number,
     dataType: PaginatedQueryType,
 ) => {
-    if (data.length < pageSize) {
-        return {
-            items: data,
-        };
-    }
-    const lastRecord = data[data.length - 1];
-    const newPaginationToken = genPaginationToken(
-        lastRecord.id,
-        lastRecord.ts,
-        dataType,
-    );
-    logger.debug(lastRecord.ts.toISOString());
+    const edges = data.map((item) => ({
+        node: item,
+        cursor: genPaginationToken(item.id, item.ts, dataType),
+    }));
+
+    const pageInfo = {
+        first: edges.length > 0 ? edges[0].cursor : null,
+        last: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+        hasNextPage: data.length === last,
+        hasPreviousPage: false,
+    };
+
     return {
-        items: data,
-        paginationToken: newPaginationToken,
+        edges,
+        pageInfo,
     };
 };
 
