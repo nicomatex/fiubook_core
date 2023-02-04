@@ -95,8 +95,8 @@ const genPaginatedResponse = <T extends PaginableDataType>(
     }));
 
     const pageInfo = {
-        first: edges.length > 0 ? edges[0].cursor : null,
-        last: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
         hasNextPage: data.length === last,
         hasPreviousPage: false,
     };

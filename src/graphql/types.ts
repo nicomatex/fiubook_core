@@ -28,79 +28,32 @@ enum BookingStatus {
     CANCELLED = 'CANCELLED',
 }
 
-// function Edge<TItem>(TItemClass: ClassType<TItem>) {
-//     @ObjectType({ isAbstract: true })
-//     abstract class EdgeClass {
-//         @Field()
-//             cursor!: string;
-
-//         @Field(() => TItemClass)
-//             node!: TItem;
-//     }
-//     return EdgeClass;
-// }
-
-// type EdgeType<TItem> = {
-//     cursor: string
-//     node: TItem
-// }
-
-// @ObjectType()
-// class PageInfoType {
-//     hasNextPage!: boolean;
-
-//     hasPreviousPage!: boolean;
-
-//     first!: string | null;
-
-//     last!: string | null;
-// }
-
-// function PaginatedResponse<TItem>(TItemClass: ClassType<TItem>) {
-//     @ObjectType({ isAbstract: true })
-//     abstract class PaginatedResponseClass {
-//         @Field(() => [Edge(TItemClass)])
-//             edges!: EdgeType<TItem>[];
-
-//         @Field(() => PageInfoType)
-//             pageInfo!: PageInfoType;
-//     }
-//     return PaginatedResponseClass;
-// }
-
 @ObjectType()
 class PageInfo {
-    hasNextPage!: boolean;
+    @Field()
+        hasNextPage!: boolean;
 
-    hasPreviousPage!: boolean;
+    @Field()
+        hasPreviousPage!: boolean;
 
-    first!: string | null;
+    @Field({ nullable: true })
+        startCursor!: string | null;
 
-    last!: string | null;
+    @Field({ nullable: true })
+        endCursor!: string | null;
 }
 
-function PaginatedResponse<TItemsFieldValue>(
-    itemsFieldValue: ClassType<TItemsFieldValue>,
-) {
+function EdgesType<TItem>(itemFieldValue: ClassType<TItem>) {
     @ObjectType({ isAbstract: true })
-    abstract class EdgeClass {
+    abstract class EdgesTypeClass {
+        @Field(() => itemFieldValue)
+            node!: TItem;
+
         @Field()
-            cursor!: string;
-
-        @Field(() => itemsFieldValue)
-            node!: TItemsFieldValue;
+            cursor!: String;
     }
 
-    // `isAbstract` decorator option is mandatory to prevent registering in schema
-    @ObjectType({ isAbstract: true })
-    abstract class PaginatedResponseClass {
-        @Field(() => [EdgeClass])
-            edges!: EdgeClass[];
-
-        @Field(() => PageInfo)
-            pageInfo!: PageInfo;
-    }
-    return PaginatedResponseClass;
+    return EdgesTypeClass;
 }
 
 type LoggedInContextType = {
@@ -153,7 +106,8 @@ registerEnumType(BookingStatus, {
 });
 
 export {
-    PaginatedResponse,
+    PageInfo,
+    EdgesType,
     ContextType,
     Credentials,
     RoleChecker,

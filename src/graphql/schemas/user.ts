@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
-import { PaginatedResponse } from '@graphql/types';
+import { EdgesType, PageInfo } from '@graphql/types';
 import {
-    ArgsType, Field, ID, InputType, ObjectType,
+    Field, ID, InputType, ObjectType,
 } from 'type-graphql';
 
 @InputType()
@@ -34,6 +34,15 @@ class User {
 }
 
 @ObjectType()
-class PaginatedUserResponse extends PaginatedResponse(User) {}
+class UsersEdgesType extends EdgesType(User) {}
+
+@ObjectType()
+class PaginatedUserResponse {
+    @Field(() => [UsersEdgesType])
+        edges!: UsersEdgesType[];
+
+    @Field(() => PageInfo)
+        pageInfo!: PageInfo;
+}
 
 export { User, PaginatedUserResponse };

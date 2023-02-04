@@ -2,7 +2,12 @@ import {
     ArgsType, Field, ID, InputType, Int, ObjectType,
 } from 'type-graphql';
 
-import { BookingType, PaginatedResponse, UniversityRole } from '@graphql/types';
+import {
+    BookingType,
+    EdgesType,
+    PageInfo,
+    UniversityRole,
+} from '@graphql/types';
 
 @InputType()
 export class CreateServiceArgs {
@@ -91,6 +96,15 @@ class Service {
 }
 
 @ObjectType()
-class PaginatedServiceResponse extends PaginatedResponse(Service) {}
+class ServicesEdgesType extends EdgesType(Service) {}
+
+@ObjectType()
+class PaginatedServiceResponse {
+    @Field(() => [ServicesEdgesType])
+        edges!: ServicesEdgesType[];
+
+    @Field(() => PageInfo)
+        pageInfo!: PageInfo;
+}
 
 export { Service, PaginatedServiceResponse };

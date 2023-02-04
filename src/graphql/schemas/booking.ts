@@ -2,7 +2,7 @@ import {
     Field, ID, InputType, ObjectType,
 } from 'type-graphql';
 
-import { BookingStatus, PaginatedResponse } from '@graphql/types';
+import { BookingStatus, EdgesType, PageInfo } from '@graphql/types';
 
 @InputType()
 export class CreateBookingArgs {
@@ -44,6 +44,15 @@ class Booking {
 }
 
 @ObjectType()
-class PaginatedBookingResponse extends PaginatedResponse(Booking) {}
+class BookingEdgesType extends EdgesType(Booking) {}
+
+@ObjectType()
+class PaginatedBookingResponse {
+    @Field(() => [BookingEdgesType])
+        edges!: BookingEdgesType[];
+
+    @Field(() => PageInfo)
+        pageInfo!: PageInfo;
+}
 
 export { Booking, PaginatedBookingResponse };
