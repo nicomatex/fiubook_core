@@ -42,9 +42,9 @@ class ServiceResolver {
     @Query(() => PaginatedServiceResponse)
     @Authorized()
     async services(
-        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('after', { nullable: true }) paginationToken?: string,
         @Arg('query_term', { nullable: true }) queryTerm?: string,
-        @Arg('page_size', { nullable: true }) pageSize?: number,
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await serviceRepository.getServices(
             paginationToken,
@@ -58,9 +58,9 @@ class ServiceResolver {
     @Authorized()
     async myServices(
         @Ctx() ctx: LoggedInContextType,
-        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
+        @Arg('after', { nullable: true }) paginationToken?: string,
         @Arg('query_term', { nullable: true }) queryTerm?: string,
-        @Arg('page_size', { nullable: true }) pageSize?: number,
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await serviceRepository.getServicesByPublisherId(
             ctx.userId,

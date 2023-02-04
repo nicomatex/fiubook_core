@@ -78,8 +78,8 @@ class BookingResolver {
     @Authorized()
     async myBookings(
         @Ctx() ctx: LoggedInContextType,
-        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
-        @Arg('page_size', { nullable: true }) pageSize?: number,
+        @Arg('after', { nullable: true }) paginationToken?: string,
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await bookingRepository.getBookingsByRequestorId(
             ctx.userId,
@@ -116,8 +116,8 @@ class BookingResolver {
     @Authorized()
     async myBookingsForPublisher(
         @Ctx() ctx: LoggedInContextType,
-        @Arg('pagination_token', { nullable: true }) paginationToken?: string,
-        @Arg('page_size', { nullable: true }) pageSize?: number,
+        @Arg('after', { nullable: true }) paginationToken?: string,
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await bookingRepository.getBookingsByPublisherId(
             ctx.userId,
