@@ -3,6 +3,8 @@ import { EdgesType, PageInfo } from '@graphql/types';
 import {
     Field, ID, InputType, ObjectType,
 } from 'type-graphql';
+import { Service } from '@graphql/schemas/service';
+import { Booking } from '@graphql/schemas/booking';
 
 @InputType()
 export class UpdateUserArgs {
@@ -29,6 +31,15 @@ class User {
 
     @Field(() => Boolean)
         can_publish_services!: boolean;
+
+    @Field(() => [Service], { nullable: true })
+        services!: Service[] | null;
+
+    @Field(() => [Booking], { nullable: true })
+        outgoing_bookings!: Booking[] | null;
+
+    @Field(() => [Booking], { nullable: true })
+        incoming_bookings!: Booking[] | null;
 
     is_admin!: boolean;
 }

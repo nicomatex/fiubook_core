@@ -8,6 +8,8 @@ import {
     PageInfo,
     UniversityRole,
 } from '@graphql/types';
+import { User } from '@graphql/schemas/user';
+import { Booking } from '@graphql/schemas/booking';
 
 @InputType()
 export class CreateServiceArgs {
@@ -65,8 +67,8 @@ class Service {
     @Field(() => ID)
         id!: string;
 
-    @Field(() => ID)
-        publisher_id!: string;
+    @Field(() => ID, { nullable: true })
+        publisher!: User | null; // This might need to be null to avoid circular dependencies
 
     @Field(() => String)
         name!: string;
@@ -93,6 +95,9 @@ class Service {
 
     @Field(() => [UniversityRole])
         allowed_roles!: UniversityRole[];
+
+    @Field(() => [Booking], { nullable: true })
+        bookings!: Booking[] | null; // This might need to be null to avoid circular dependencies
 }
 
 @ObjectType()

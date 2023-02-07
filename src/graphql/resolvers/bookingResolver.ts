@@ -50,7 +50,9 @@ class BookingResolver {
             ctx.userId,
         );
 
-        return insertedBooking;
+        const booking = { ...insertedBooking, service: requestedService };
+
+        return booking;
     }
 
     @Authorized()

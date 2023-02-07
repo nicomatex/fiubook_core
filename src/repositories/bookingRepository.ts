@@ -10,7 +10,7 @@ import {
 } from '@util/dbUtil';
 import adaptBooking from '@repositories/dataAdapters/bookingDataAdapter';
 import { BookingStatus } from '@graphql/types';
-import { DatabaseBooking } from '@repositories/types';
+import { DatabaseBooking, DatabaseService } from '@repositories/types';
 
 const connection = knex({ ...config.knex });
 
@@ -82,7 +82,7 @@ const getBookingsByPublisherId = async (
 
 const createBooking = async (
     creationArgs: CreateBookingArgs,
-    requestedService: Service,
+    requestedService: DatabaseService,
     requestorId: string,
 ): Promise<DatabaseBooking> => {
     const bookingStatus = requestedService.booking_type === 'AUTOMATIC'

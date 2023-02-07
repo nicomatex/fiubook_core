@@ -26,14 +26,11 @@ class Booking {
     @Field()
         ts!: Date;
 
-    @Field(() => Service)
-        service!: Service;
+    @Field(() => Service, { nullable: true })
+        service!: Service | null;
 
-    @Field(() => User)
-        requestor!: User;
-
-    @Field(() => User)
-        publisher!: User;
+    @Field(() => User, { nullable: true })
+        requestor!: User | null;
 
     @Field()
         start_date!: Date;
