@@ -14,13 +14,14 @@ import {
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
+import { DatabaseService } from '@repositories/types';
 
 const connection = knex({ ...config.knex });
 
 const addService = async (
     creationArgs: CreateServiceArgs,
     publisherId: string,
-): Promise<Service> => {
+): Promise<DatabaseService> => {
     const id = uuidv4();
 
     const newService = {
@@ -42,7 +43,7 @@ const getServices = async (
     paginationToken?: string,
     queryTerm?: string,
     pageSize?: number,
-): Promise<PaginatedServiceResponse> => {
+): Promise<DatabaseService[]> => {
     const query = connection('services')
         .orderBy('ts')
         .orderBy('id')
@@ -58,18 +59,14 @@ const getServices = async (
 
     const parsedData = data.map(adaptService);
 
-    return genPaginatedResponse(
-        parsedData,
-        pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Services,
-    );
+    return parsedData;
 };
 
 const getServicesByPublisherId = async (
     userId: string,
     paginationToken?: string,
     pageSize?: number,
-) => {
+): Promise<DatabaseService[]> => {
     const query = connection('services')
         .where({ publisher_id: userId })
         .orderBy('ts')
@@ -85,14 +82,10 @@ const getServicesByPublisherId = async (
 
     const parsedData = data.map(adaptService);
 
-    return genPaginatedResponse(
-        parsedData,
-        pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Services,
-    );
+    return parsedData;
 };
 
-const getServiceById = async (serviceId: string) => {
+const getServiceById = async (serviceId: string): Promise<DatabaseService> => {
     const query = connection('services').where({ id: serviceId });
 
     const data = await query;
@@ -107,7 +100,7 @@ const getServiceById = async (serviceId: string) => {
 const updateServiceById = async (
     serviceId: string,
     updateArgs: UpdateServiceArgs,
-) => {
+): Promise<DatabaseService> => {
     const query = connection('services')
         .where({ id: serviceId })
         .update(updateArgs)

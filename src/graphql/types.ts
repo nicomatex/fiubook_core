@@ -1,5 +1,5 @@
+import { BookingStatus, BookingType, UniversityRole } from '@repositories/types';
 import { MaxLength } from 'class-validator';
-import { TypeInfo } from 'graphql';
 import {
     ClassType,
     Field,
@@ -10,23 +10,6 @@ import {
 } from 'type-graphql';
 
 type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
-
-enum BookingType {
-    AUTOMATIC = 'AUTOMATIC',
-    REQUIRES_CONFIRMATION = 'REQUIRES_CONFIRMATION',
-}
-
-enum UniversityRole {
-    STUDENT = 'STUDENT',
-    PROFESSOR = 'PROFESSOR',
-    NODO = 'NODO',
-}
-
-enum BookingStatus {
-    PENDING_CONFIRMATION = 'PENDING_CONFIRMATION',
-    CONFIRMED = 'CONFIRMED',
-    CANCELLED = 'CANCELLED',
-}
 
 @ObjectType()
 class PageInfo {

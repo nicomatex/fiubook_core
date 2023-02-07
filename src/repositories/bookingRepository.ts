@@ -10,6 +10,7 @@ import {
 } from '@util/dbUtil';
 import adaptBooking from '@repositories/dataAdapters/bookingDataAdapter';
 import { BookingStatus } from '@graphql/types';
+import { DatabaseBooking } from '@repositories/types';
 
 const connection = knex({ ...config.knex });
 
@@ -17,7 +18,7 @@ const getConflictingBookings = async (
     serviceId: string,
     startDate: Date,
     endDate: Date,
-) => {
+): Promise<DatabaseBooking[]> => {
     const query = connection('bookings')
         .where({ service_id: serviceId })
         .andWhere((connection) => {
@@ -38,7 +39,7 @@ const getBookingsByRequestorId = async (
     requestorId: string,
     paginationToken?: string,
     pageSize?: number,
-) => {
+): Promise<DatabaseBooking[]> => {
     const query = connection('bookings')
         .where({ requestor_id: requestorId })
         .orderBy('ts')
@@ -53,18 +54,14 @@ const getBookingsByRequestorId = async (
     const data = await query;
     const parsedData = data.map(adaptBooking);
 
-    return genPaginatedResponse(
-        parsedData,
-        pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings,
-    );
+    return parsedData;
 };
 
 const getBookingsByPublisherId = async (
     publisherId: string,
     paginationToken?: string,
     pageSize?: number,
-) => {
+): Promise<DatabaseBooking[]> => {
     const query = connection('bookings')
         .where({ publisher_id: publisherId })
         .orderBy('ts', 'desc')
@@ -80,18 +77,14 @@ const getBookingsByPublisherId = async (
     const data = await query;
     const parsedData = data.map(adaptBooking);
 
-    return genPaginatedResponse(
-        parsedData,
-        pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings,
-    );
+    return parsedData;
 };
 
 const createBooking = async (
     creationArgs: CreateBookingArgs,
     requestedService: Service,
     requestorId: string,
-) => {
+): Promise<DatabaseBooking> => {
     const bookingStatus = requestedService.booking_type === 'AUTOMATIC'
         ? BookingStatus.CONFIRMED
         : BookingStatus.PENDING_CONFIRMATION;
@@ -112,7 +105,7 @@ const createBooking = async (
     return insertedBooking;
 };
 
-const getBookingById = async (id: string) => {
+const getBookingById = async (id: string): Promise<DatabaseBooking> => {
     const query = connection('bookings').where({ id });
 
     const data = await query;
@@ -124,7 +117,7 @@ const getBookingById = async (id: string) => {
     return parsedBooking;
 };
 
-const deleteBookingById = async (id: string) => {
+const deleteBookingById = async (id: string): Promise<boolean> => {
     const query = connection('bookings').where({ id }).del();
     const res = await query;
     return res >= 1;
@@ -133,7 +126,7 @@ const deleteBookingById = async (id: string) => {
 const updateBookingStatusById = async (
     id: string,
     newStatus: BookingStatus,
-) => {
+): Promise<DatabaseBooking> => {
     const query = connection('bookings')
         .where({ id })
         .update({ booking_status: newStatus })

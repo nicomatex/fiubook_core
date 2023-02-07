@@ -12,12 +12,13 @@ import {
     withPaginationToken,
 } from '@util/dbUtil';
 import adaptUser from '@repositories/dataAdapters/userDataAdapter';
+import { DatabaseUser } from '@repositories/types';
 
 const connection = knex({ ...config.knex });
 
 const defaultRoles = ['STUDENT'];
 
-const addUser = async (dni: string): Promise<User> => {
+const addUser = async (dni: string): Promise<DatabaseUser> => {
     const id = uuidv4();
     const newUser = {
         id,
@@ -35,7 +36,8 @@ const addUser = async (dni: string): Promise<User> => {
     return parsedInsertedUser;
 };
 
-const getUserByDNI = async (dni: string): Promise<User | null> => {
+// TODO: returning null might not be consistent with other parts of code, where an error is thrown
+const getUserByDNI = async (dni: string): Promise<DatabaseUser | null> => {
     const res = await connection('users').where({ dni });
     if (res.length === 0) return null;
     const user = res[0];
@@ -44,7 +46,7 @@ const getUserByDNI = async (dni: string): Promise<User | null> => {
     return parsedUser;
 };
 
-const getUserById = async (id: string): Promise<User> => {
+const getUserById = async (id: string): Promise<DatabaseUser> => {
     const res = await connection('users').where({ id });
     if (res.length === 0) throw new Error(`User with id ${id} not found`);
     const user = res[0];
@@ -56,7 +58,7 @@ const getUserById = async (id: string): Promise<User> => {
 const getUsers = async (
     paginationToken?: string,
     pageSize?: number,
-): Promise<PaginatedUserResponse> => {
+): Promise<DatabaseUser[]> => {
     const query = connection('users')
         .orderBy('ts')
         .orderBy('id')
@@ -67,14 +69,13 @@ const getUsers = async (
 
     const parsedData = data.map(adaptUser);
 
-    return genPaginatedResponse(
-        parsedData,
-        pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Users,
-    );
+    return parsedData;
 };
 
-const updateUserById = async (userId: string, updateArgs: UpdateUserArgs) => {
+const updateUserById = async (
+    userId: string,
+    updateArgs: UpdateUserArgs,
+): Promise<DatabaseUser> => {
     const query = connection('users')
         .where({ id: userId })
         .update(updateArgs)

@@ -3,6 +3,8 @@ import {
 } from 'type-graphql';
 
 import { BookingStatus, EdgesType, PageInfo } from '@graphql/types';
+import { Service } from '@graphql/schemas/service';
+import { User } from '@graphql/schemas/user';
 
 @InputType()
 export class CreateBookingArgs {
@@ -24,14 +26,14 @@ class Booking {
     @Field()
         ts!: Date;
 
-    @Field(() => ID)
-        service_id!: string;
+    @Field(() => Service)
+        service!: Service;
 
-    @Field(() => ID)
-        requestor_id!: string;
+    @Field(() => User)
+        requestor!: User;
 
-    @Field(() => ID)
-        publisher_id!: string;
+    @Field(() => User)
+        publisher!: User;
 
     @Field()
         start_date!: Date;
