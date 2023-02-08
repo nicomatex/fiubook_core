@@ -8,6 +8,7 @@ import {
     PageInfo,
     UniversityRole,
 } from '@graphql/types';
+import { User } from '@graphql/schemas/user';
 
 @InputType()
 export class CreateServiceArgs {
@@ -93,6 +94,9 @@ class Service {
 
     @Field(() => [UniversityRole])
         allowed_roles!: UniversityRole[];
+
+    @Field(() => User, { nullable: true })
+        publisher?: User | null;
 }
 
 @ObjectType()

@@ -4,6 +4,7 @@ import {
 
 import { BookingStatus, EdgesType, PageInfo } from '@graphql/types';
 import { Service } from '@graphql/schemas/service';
+import { User } from '@graphql/schemas/user';
 
 @InputType()
 export class CreateBookingArgs {
@@ -45,6 +46,9 @@ class Booking {
 
     @Field()
         booking_status!: BookingStatus;
+
+    @Field(() => User, { nullable: true })
+        requestor?: User | null;
 }
 
 @ObjectType()

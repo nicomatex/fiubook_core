@@ -18,6 +18,8 @@ import {
 import serviceRepository from '@repositories/serviceRepository';
 import bookingRepository from '@repositories/bookingRepository';
 import { Service } from '@graphql/schemas/service';
+import userRepository from '@repositories/userRepository';
+import { User } from '@graphql/schemas/user';
 
 @Resolver(() => Booking)
 class BookingResolver {
@@ -166,6 +168,18 @@ class BookingResolver {
             booking.service_id,
         );
         return service;
+    }
+
+    @FieldResolver(() => User)
+    async requestor(@Root() booking: Booking) {
+        const requestor = await userRepository.getUserById(booking.requestor_id);
+        return requestor;
+    }
+
+    @FieldResolver(() => User)
+    async publisher(@Root() booking: Booking) {
+        const publisher = await userRepository.getUserById(booking.publisher_id);
+        return publisher;
     }
 }
 
