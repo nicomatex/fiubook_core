@@ -1,6 +1,13 @@
 /* eslint-disable class-methods-use-this */
 import {
-    Arg, Authorized, Ctx, Mutation, Query, Resolver,
+    Arg,
+    Authorized,
+    Ctx,
+    FieldResolver,
+    Mutation,
+    Query,
+    Resolver,
+    Root,
 } from 'type-graphql';
 import { BookingStatus, LoggedInContextType } from '@graphql/types';
 import {
@@ -12,7 +19,7 @@ import serviceRepository from '@repositories/serviceRepository';
 import bookingRepository from '@repositories/bookingRepository';
 import { Service } from '@graphql/schemas/service';
 
-@Resolver()
+@Resolver(() => Booking)
 class BookingResolver {
     @Authorized(['BOOKING_ROLES'])
     @Mutation(() => Booking)
@@ -151,6 +158,14 @@ class BookingResolver {
         );
 
         return res;
+    }
+
+    @FieldResolver()
+    async service(@Root() booking: Booking) {
+        const service = await serviceRepository.getServiceById(
+            booking.service_id,
+        );
+        return service;
     }
 }
 
