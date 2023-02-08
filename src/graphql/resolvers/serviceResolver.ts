@@ -10,14 +10,17 @@ import {
     Args,
     Authorized,
     Ctx,
+    FieldResolver,
     Mutation,
     Query,
     Resolver,
+    Root,
 } from 'type-graphql';
 import serviceRepository from '@repositories/serviceRepository';
 import { LoggedInContextType } from '@graphql/types';
+import userRepository from '@repositories/userRepository';
 
-@Resolver()
+@Resolver(() => Service)
 class ServiceResolver {
     @Authorized(['PUBLISHER'])
     @Mutation(() => Service)
@@ -86,6 +89,12 @@ class ServiceResolver {
             updateArgs,
         );
         return res;
+    }
+
+    @FieldResolver()
+    async publisher(@Root() service: Service) {
+        const publisher = await userRepository.getUserById(service.publisher_id);
+        return publisher;
     }
 }
 
