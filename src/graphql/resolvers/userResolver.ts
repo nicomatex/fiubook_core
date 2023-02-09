@@ -3,6 +3,7 @@
 import {
     Arg,
     Authorized,
+    Ctx,
     Mutation,
     Query,
     Resolver,
@@ -16,7 +17,7 @@ import {
 } from '@graphql/schemas/user';
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
-import { Credentials } from '@graphql/types';
+import { Credentials, LoggedInContextType } from '@graphql/types';
 
 @Resolver()
 class UserResolver {
@@ -68,6 +69,13 @@ class UserResolver {
         @Arg('update_args') updateArgs: UpdateUserArgs,
     ) {
         const res = await userRepository.updateUserById(id, updateArgs);
+        return res;
+    }
+
+    @Query(() => User)
+    @Authorized()
+    async me(@Ctx() ctx: LoggedInContextType) {
+        const res = await userRepository.getUserById(ctx.userId);
         return res;
     }
 }
