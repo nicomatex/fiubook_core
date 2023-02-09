@@ -41,12 +41,13 @@ const getBookingsByRequestorId = async (
 ) => {
     const query = connection('bookings')
         .where({ requestor_id: requestorId })
-        .orderBy('ts')
+        .orderBy('ts', 'desc')
         .orderBy('id')
         .modify(
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
+            true,
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
