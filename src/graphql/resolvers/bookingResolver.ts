@@ -67,7 +67,7 @@ class BookingResolver {
         @Arg('service_id') serviceId: string,
         @Arg('start_date') startDate: Date,
         @Arg('end_date') endDate: Date,
-    ): Promise<Service[]> {
+    ): Promise<Booking[]> {
         if (endDate <= startDate) {
             throw new Error(
                 'End date cannot be equal or earlier than start date',
