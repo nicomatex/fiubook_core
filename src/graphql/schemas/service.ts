@@ -43,9 +43,6 @@ export class UpdateServiceArgs {
         granularity?: number;
 
     @Field(() => Int, { nullable: true })
-        min_time?: number;
-
-    @Field(() => Int, { nullable: true })
         max_time?: number;
 
     @Field(() => BookingType, { nullable: true })
@@ -74,11 +71,6 @@ class Service {
 
     @Field(() => Int, { description: 'Time slot granularity in seconds' })
         granularity!: number;
-
-    @Field(() => Int, {
-        description: 'Minimum amount of time slots to reserve',
-    })
-        min_time!: number;
 
     @Field(() => Int, {
         description: 'Maximum amount of time slots to reserve',

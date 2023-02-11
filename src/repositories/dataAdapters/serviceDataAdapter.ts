@@ -2,22 +2,21 @@ import { Service } from '@graphql/schemas/service';
 import { BookingType, UniversityRole } from '@graphql/types';
 import { parse } from 'postgres-array';
 
-interface PostgresInterval{
-    toPostgres: () => string,
-    toISO: () => string,
+interface PostgresInterval {
+    toPostgres: () => string
+    toISO: () => string
 }
 
 export type RawService = {
-    id: string,
-    ts: Date,
-    publisher_id: string,
-    name: string,
-    description: string,
-    granularity: number,
-    min_time: number,
-    max_time: number,
-    booking_type: string,
-    allowed_roles: string,
+    id: string
+    ts: Date
+    publisher_id: string
+    name: string
+    description: string
+    granularity: number
+    max_time: number
+    booking_type: string
+    allowed_roles: string
 }
 
 const adapt = (rawService: RawService): Service => ({
