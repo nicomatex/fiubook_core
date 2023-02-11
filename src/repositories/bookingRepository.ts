@@ -1,9 +1,10 @@
 import config from '@config/default';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateBookingArgs } from '@graphql/schemas/booking';
+import { BookingEdgesType, CreateBookingArgs } from '@graphql/schemas/booking';
 import knex from 'knex';
 import { Service } from '@graphql/schemas/service';
 import {
+    genEdge,
     genPaginatedResponse,
     PaginatedQueryType,
     withPaginationToken,
@@ -16,7 +17,7 @@ const connection = knex({ ...config.knex });
 const getConflictingBookings = async (
     serviceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
 ) => {
     const query = connection('bookings')
         .where({ service_id: serviceId })
@@ -37,7 +38,7 @@ const getConflictingBookings = async (
 const getBookingsByRequestorId = async (
     requestorId: string,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const query = connection('bookings')
         .where({ requestor_id: requestorId })
@@ -47,7 +48,7 @@ const getBookingsByRequestorId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -57,14 +58,14 @@ const getBookingsByRequestorId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings,
+        PaginatedQueryType.Bookings
     );
 };
 
 const getBookingsByPublisherId = async (
     publisherId: string,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const query = connection('bookings')
         .where({ publisher_id: publisherId })
@@ -74,7 +75,7 @@ const getBookingsByPublisherId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -84,18 +85,19 @@ const getBookingsByPublisherId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings,
+        PaginatedQueryType.Bookings
     );
 };
 
 const createBooking = async (
     creationArgs: CreateBookingArgs,
     requestedService: Service,
-    requestorId: string,
+    requestorId: string
 ) => {
-    const bookingStatus = requestedService.booking_type === 'AUTOMATIC'
-        ? BookingStatus.CONFIRMED
-        : BookingStatus.PENDING_CONFIRMATION;
+    const bookingStatus =
+        requestedService.booking_type === 'AUTOMATIC'
+            ? BookingStatus.CONFIRMED
+            : BookingStatus.PENDING_CONFIRMATION;
 
     const newBooking = {
         ...creationArgs,
@@ -110,7 +112,11 @@ const createBooking = async (
         .insert(newBooking)
         .returning('*');
     const insertedBooking = insertionResult[0];
-    return insertedBooking;
+    const bookingEdge: BookingEdgesType = genEdge(
+        insertedBooking,
+        PaginatedQueryType.Bookings
+    );
+    return bookingEdge;
 };
 
 const getBookingById = async (id: string) => {
@@ -133,7 +139,7 @@ const deleteBookingById = async (id: string) => {
 
 const updateBookingStatusById = async (
     id: string,
-    newStatus: BookingStatus,
+    newStatus: BookingStatus
 ) => {
     const query = connection('bookings')
         .where({ id })
