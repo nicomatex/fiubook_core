@@ -21,9 +21,6 @@ export class CreateServiceArgs {
     @Field(() => Int)
         granularity!: number;
 
-    @Field(() => Int)
-        min_time!: number;
-
     @Field(() => Int, { nullable: true })
         max_time?: number;
 
