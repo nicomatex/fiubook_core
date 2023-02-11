@@ -17,10 +17,11 @@ const connection = knex({ ...config.knex });
 const getConflictingBookings = async (
     serviceId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
 ) => {
     const query = connection('bookings')
         .where({ service_id: serviceId })
+        .whereNot({ booking_status: BookingStatus.CANCELLED })
         .andWhere((connection) => {
             connection
                 .whereBetween('start_date', [startDate, endDate])
@@ -38,7 +39,7 @@ const getConflictingBookings = async (
 const getBookingsByRequestorId = async (
     requestorId: string,
     paginationToken?: string,
-    pageSize?: number
+    pageSize?: number,
 ) => {
     const query = connection('bookings')
         .where({ requestor_id: requestorId })
@@ -48,7 +49,7 @@ const getBookingsByRequestorId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true
+            true,
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -58,14 +59,14 @@ const getBookingsByRequestorId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings
+        PaginatedQueryType.Bookings,
     );
 };
 
 const getBookingsByPublisherId = async (
     publisherId: string,
     paginationToken?: string,
-    pageSize?: number
+    pageSize?: number,
 ) => {
     const query = connection('bookings')
         .where({ publisher_id: publisherId })
@@ -75,7 +76,7 @@ const getBookingsByPublisherId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true
+            true,
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -85,19 +86,18 @@ const getBookingsByPublisherId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings
+        PaginatedQueryType.Bookings,
     );
 };
 
 const createBooking = async (
     creationArgs: CreateBookingArgs,
     requestedService: Service,
-    requestorId: string
+    requestorId: string,
 ) => {
-    const bookingStatus =
-        requestedService.booking_type === 'AUTOMATIC'
-            ? BookingStatus.CONFIRMED
-            : BookingStatus.PENDING_CONFIRMATION;
+    const bookingStatus = requestedService.booking_type === 'AUTOMATIC'
+        ? BookingStatus.CONFIRMED
+        : BookingStatus.PENDING_CONFIRMATION;
 
     const newBooking = {
         ...creationArgs,
@@ -114,7 +114,7 @@ const createBooking = async (
     const insertedBooking = insertionResult[0];
     const bookingEdge: BookingEdgesType = genEdge(
         insertedBooking,
-        PaginatedQueryType.Bookings
+        PaginatedQueryType.Bookings,
     );
     return bookingEdge;
 };
@@ -139,7 +139,7 @@ const deleteBookingById = async (id: string) => {
 
 const updateBookingStatusById = async (
     id: string,
-    newStatus: BookingStatus
+    newStatus: BookingStatus,
 ) => {
     const query = connection('bookings')
         .where({ id })
