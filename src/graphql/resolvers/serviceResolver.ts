@@ -20,18 +20,27 @@ import serviceRepository from '@repositories/serviceRepository';
 import { LoggedInContextType } from '@graphql/types';
 import userRepository from '@repositories/userRepository';
 
+const validateServiceModification = (
+    ctx: LoggedInContextType,
+    service: Service
+) => {
+    if (service.publisher_id !== ctx.userId && !ctx.isAdmin) {
+        throw new Error('You are not the publisher of this service');
+    }
+};
+
 @Resolver(() => Service)
 class ServiceResolver {
     @Authorized(['PUBLISHER'])
     @Mutation(() => Service)
     async createService(
         @Arg('creationArgs') creationArgs: CreateServiceArgs,
-        @Ctx() ctx: LoggedInContextType,
+        @Ctx() ctx: LoggedInContextType
     ): Promise<Service> {
         try {
             const res = await serviceRepository.addService(
                 creationArgs,
-                ctx.userId,
+                ctx.userId
             );
             return res;
         } catch (err: any) {
@@ -47,12 +56,12 @@ class ServiceResolver {
     async services(
         @Arg('after', { nullable: true }) paginationToken?: string,
         @Arg('query_term', { nullable: true }) queryTerm?: string,
-        @Arg('first', { nullable: true }) pageSize?: number,
+        @Arg('first', { nullable: true }) pageSize?: number
     ) {
         const res = await serviceRepository.getServices(
             paginationToken,
             queryTerm,
-            pageSize,
+            pageSize
         );
         return res;
     }
@@ -63,12 +72,12 @@ class ServiceResolver {
         @Ctx() ctx: LoggedInContextType,
         @Arg('after', { nullable: true }) paginationToken?: string,
         @Arg('query_term', { nullable: true }) queryTerm?: string,
-        @Arg('first', { nullable: true }) pageSize?: number,
+        @Arg('first', { nullable: true }) pageSize?: number
     ) {
         const res = await serviceRepository.getServicesByPublisherId(
             ctx.userId,
             paginationToken,
-            pageSize,
+            pageSize
         );
         return res;
     }
@@ -78,23 +87,39 @@ class ServiceResolver {
     async updateService(
         @Arg('service_id') serviceId: string,
         @Arg('update_args') updateArgs: UpdateServiceArgs,
-        @Ctx() ctx: LoggedInContextType,
+        @Ctx() ctx: LoggedInContextType
     ) {
         const service = await serviceRepository.getServiceById(serviceId);
-        if (service.publisher_id !== ctx.userId) {
-            throw new Error('You are not the publisher of this service');
-        }
+
+        validateServiceModification(ctx, service);
+
         const res = await serviceRepository.updateServiceById(
             serviceId,
-            updateArgs,
+            updateArgs
         );
         return res;
     }
 
     @FieldResolver()
     async publisher(@Root() service: Service) {
-        const publisher = await userRepository.getUserById(service.publisher_id);
+        const publisher = await userRepository.getUserById(
+            service.publisher_id
+        );
         return publisher;
+    }
+
+    @Authorized(['PUBLISHER'])
+    @Mutation(() => Service)
+    async deleteService(
+        @Arg('service_id') serviceId: string,
+        @Ctx() ctx: LoggedInContextType
+    ): Promise<Service> {
+        const service = await serviceRepository.getServiceById(serviceId);
+
+        validateServiceModification(ctx, service);
+
+        const res = await serviceRepository.deleteServiceById(serviceId);
+        return res;
     }
 }
 
