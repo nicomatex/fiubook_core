@@ -19,7 +19,7 @@ const connection = knex({ ...config.knex });
 
 const addService = async (
     creationArgs: CreateServiceArgs,
-    publisherId: string,
+    publisherId: string
 ): Promise<Service> => {
     const id = uuidv4();
 
@@ -41,7 +41,7 @@ const addService = async (
 const getServices = async (
     paginationToken?: string,
     queryTerm?: string,
-    pageSize?: number,
+    pageSize?: number
 ): Promise<PaginatedServiceResponse> => {
     const query = connection('services')
         .orderBy('ts')
@@ -49,7 +49,7 @@ const getServices = async (
         .modify(
             withPaginationToken,
             PaginatedQueryType.Services,
-            paginationToken,
+            paginationToken
         )
         .modify(withQueryTerm, 'search_index', queryTerm)
         .limit(pageSize ?? config.pagination.pageSize);
@@ -61,14 +61,14 @@ const getServices = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Services,
+        PaginatedQueryType.Services
     );
 };
 
 const getServicesByPublisherId = async (
     userId: string,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const query = connection('services')
         .where({ publisher_id: userId })
@@ -77,7 +77,7 @@ const getServicesByPublisherId = async (
         .modify(
             withPaginationToken,
             PaginatedQueryType.Services,
-            paginationToken,
+            paginationToken
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -88,7 +88,7 @@ const getServicesByPublisherId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Services,
+        PaginatedQueryType.Services
     );
 };
 
@@ -96,7 +96,8 @@ const getServiceById = async (serviceId: string) => {
     const query = connection('services').where({ id: serviceId });
 
     const data = await query;
-    if (data.length === 0) throw new Error(`Service with id ${serviceId} not found`);
+    if (data.length === 0)
+        throw new Error(`Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -106,7 +107,7 @@ const getServiceById = async (serviceId: string) => {
 
 const updateServiceById = async (
     serviceId: string,
-    updateArgs: UpdateServiceArgs,
+    updateArgs: UpdateServiceArgs
 ) => {
     const query = connection('services')
         .where({ id: serviceId })
@@ -114,7 +115,24 @@ const updateServiceById = async (
         .returning('*');
 
     const data = await query;
-    if (data.length === 0) throw new Error(`Service with id ${serviceId} not found`);
+    if (data.length === 0)
+        throw new Error(`Service with id ${serviceId} not found`);
+    const service = data[0];
+
+    const parsedService = adaptService(service);
+
+    return parsedService;
+};
+
+const deleteServiceById = async (serviceId: string) => {
+    const query = connection('services')
+        .where({ id: serviceId })
+        .delete()
+        .returning('*');
+
+    const data = await query;
+    if (data.length === 0)
+        throw new Error(`Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -124,6 +142,7 @@ const updateServiceById = async (
 
 export default {
     addService,
+    deleteServiceById,
     getServices,
     getServicesByPublisherId,
     getServiceById,
