@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '@config/default';
 import { User } from '@graphql/schemas/user';
 import { LoggedInContextType, UniversityRole } from '@graphql/types';
+import { createError } from 'src/errors/errorParser';
 
 const createSessionToken = (user: User): string => {
     const tokenPayload = {
@@ -18,19 +19,17 @@ const createSessionToken = (user: User): string => {
     return token;
 };
 
-const decodeSessionToken = (
-    token: string,
-): LoggedInContextType => {
+const decodeSessionToken = (token: string): LoggedInContextType => {
     let payload;
     try {
         payload = jwt.verify(token, config.session.secret) as {
-            userId: string
-            roles: UniversityRole[]
-            canPublishServices: boolean
-            isAdmin: boolean
+            userId: string;
+            roles: UniversityRole[];
+            canPublishServices: boolean;
+            isAdmin: boolean;
         };
     } catch (e) {
-        throw new Error('Invalid authorization token');
+        throw createError(400, 'Invalid authorization token');
     }
 
     return {
@@ -45,7 +44,7 @@ const decodeSessionToken = (
 // TODO: unmock this implementation
 const checkFIUBACredentials = async (
     dni: string,
-    password: string,
+    password: string
 ): Promise<boolean> => true;
 
 export { createSessionToken, checkFIUBACredentials, decodeSessionToken };

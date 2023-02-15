@@ -11,13 +11,14 @@ import {
 } from '@util/dbUtil';
 import adaptBooking from '@repositories/dataAdapters/bookingDataAdapter';
 import { BookingStatus } from '@graphql/types';
+import { createError } from 'src/errors/errorParser';
 
 const connection = knex({ ...config.knex });
 
 const getConflictingBookings = async (
     serviceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
 ) => {
     const query = connection('bookings')
         .where({ service_id: serviceId })
@@ -39,7 +40,7 @@ const getConflictingBookings = async (
 const getBookingsByRequestorId = async (
     requestorId: string,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const query = connection('bookings')
         .where({ requestor_id: requestorId })
@@ -49,7 +50,7 @@ const getBookingsByRequestorId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -59,14 +60,14 @@ const getBookingsByRequestorId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings,
+        PaginatedQueryType.Bookings
     );
 };
 
 const getBookingsByPublisherId = async (
     publisherId: string,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const query = connection('bookings')
         .where({ publisher_id: publisherId })
@@ -76,7 +77,7 @@ const getBookingsByPublisherId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
@@ -86,18 +87,19 @@ const getBookingsByPublisherId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Bookings,
+        PaginatedQueryType.Bookings
     );
 };
 
 const createBooking = async (
     creationArgs: CreateBookingArgs,
     requestedService: Service,
-    requestorId: string,
+    requestorId: string
 ) => {
-    const bookingStatus = requestedService.booking_type === 'AUTOMATIC'
-        ? BookingStatus.CONFIRMED
-        : BookingStatus.PENDING_CONFIRMATION;
+    const bookingStatus =
+        requestedService.booking_type === 'AUTOMATIC'
+            ? BookingStatus.CONFIRMED
+            : BookingStatus.PENDING_CONFIRMATION;
 
     const newBooking = {
         ...creationArgs,
@@ -114,7 +116,7 @@ const createBooking = async (
     const insertedBooking = insertionResult[0];
     const bookingEdge: BookingEdgesType = genEdge(
         insertedBooking,
-        PaginatedQueryType.Bookings,
+        PaginatedQueryType.Bookings
     );
     return bookingEdge;
 };
@@ -123,7 +125,8 @@ const getBookingById = async (id: string) => {
     const query = connection('bookings').where({ id });
 
     const data = await query;
-    if (data.length === 0) throw new Error(`Booking with id ${id} not found`);
+    if (data.length === 0)
+        throw createError(404, `Booking with id ${id} not found`);
     const booking = data[0];
 
     const parsedBooking = adaptBooking(booking);
@@ -139,14 +142,15 @@ const deleteBookingById = async (id: string) => {
 
 const updateBookingStatusById = async (
     id: string,
-    newStatus: BookingStatus,
+    newStatus: BookingStatus
 ) => {
     const query = connection('bookings')
         .where({ id })
         .update({ booking_status: newStatus })
         .returning('*');
     const data = await query;
-    if (data.length === 0) throw new Error(`Booking with id ${id} not found`);
+    if (data.length === 0)
+        throw createError(404, `Booking with id ${id} not found`);
 
     const modifiedBooking = data[0];
 

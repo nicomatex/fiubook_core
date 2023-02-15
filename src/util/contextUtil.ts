@@ -1,6 +1,7 @@
 import { ContextType } from '@graphql/types';
 import type { IncomingHttpHeaders } from 'http';
 import { decodeSessionToken } from '@util/authUtil';
+import { createError } from 'src/errors/errorParser';
 
 const buildContext = (headers: IncomingHttpHeaders): ContextType => {
     const authHeader = headers.authorization;
@@ -11,7 +12,8 @@ const buildContext = (headers: IncomingHttpHeaders): ContextType => {
     }
 
     const [type, token] = authHeader.split(' ');
-    if (type !== 'Bearer') throw new Error('Wrong token type, not Bearer');
+    if (type !== 'Bearer')
+        throw createError(400, 'Wrong token type, not Bearer');
 
     const sessionPayload = decodeSessionToken(token);
     return sessionPayload;

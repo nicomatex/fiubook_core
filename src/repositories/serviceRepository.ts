@@ -14,6 +14,7 @@ import {
 import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
+import { createError } from 'src/errors/errorParser';
 
 const connection = knex({ ...config.knex });
 
@@ -97,7 +98,7 @@ const getServiceById = async (serviceId: string) => {
 
     const data = await query;
     if (data.length === 0)
-        throw new Error(`Service with id ${serviceId} not found`);
+        throw createError(404, `Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -116,7 +117,7 @@ const updateServiceById = async (
 
     const data = await query;
     if (data.length === 0)
-        throw new Error(`Service with id ${serviceId} not found`);
+        throw createError(404, `Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -132,7 +133,7 @@ const deleteServiceById = async (serviceId: string) => {
 
     const data = await query;
     if (data.length === 0)
-        throw new Error(`Service with id ${serviceId} not found`);
+        throw createError(404, `Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);

@@ -22,16 +22,20 @@ import bookingRepository from '@repositories/bookingRepository';
 import userRepository from '@repositories/userRepository';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
+import { createError } from 'src/errors/errorParser';
 
 const validateBookingDateLimits = ({
     start_date: startDate,
     end_date: endDate,
 }: CreateBookingArgs) => {
     if (startDate.getTime() < Date.now()) {
-        throw new Error('Start date cannot be in the past.');
+        throw createError(400, 'Start date cannot be in the past.');
     }
     if (endDate <= startDate) {
-        throw new Error('End date cannot be equal or earlier than start date');
+        throw createError(
+            400,
+            'End date cannot be equal or earlier than start date.'
+        );
     }
 };
 
@@ -47,8 +51,9 @@ const validateNoConflictingBookings = async ({
     );
 
     if (conflictingBookings.length > 0) {
-        throw new Error(
-            'There are conflicts with other bookings in the selected time interval'
+        throw createError(
+            409,
+            'There are conflicts with other bookings in the selected time interval.'
         );
     }
 };
@@ -62,15 +67,17 @@ const validateBookingSlot = (
     const endTime = endDate.getTime();
 
     if ((endTime - startTime) % granularityMs > 0) {
-        throw new Error(
-            `Booking slot duration must be a multiple of the granularity (${granularity} seconds)`
+        throw createError(
+            400,
+            `Booking slot duration must be a multiple of the granularity (${granularity} seconds).`
         );
     }
 
     const bookingLengthInSlots = (endTime - startTime) / granularityMs;
     if (maxTime && bookingLengthInSlots > maxTime) {
-        throw new Error(
-            `Booking slot length (${bookingLengthInSlots} slots of ${granularity} seconds) exceeds maximum amount of slots (${maxTime} slots)`
+        throw createError(
+            400,
+            `Booking slot length (${bookingLengthInSlots} slots of ${granularity} seconds) exceeds maximum amount of slots (${maxTime} slots).`
         );
     }
 };
@@ -110,8 +117,9 @@ class BookingResolver {
         @Arg('end_date') endDate: Date
     ): Promise<Booking[]> {
         if (endDate <= startDate) {
-            throw new Error(
-                'End date cannot be equal or earlier than start date'
+            throw createError(
+                400,
+                'End date cannot be equal or earlier than start date.'
             );
         }
 
@@ -153,7 +161,7 @@ class BookingResolver {
             booking.requestor_id !== ctx.userId &&
             booking.publisher_id !== ctx.userId
         ) {
-            throw new Error('You are not authorized for this action.');
+            throw createError(403, 'You are not authorized for this action.');
         }
 
         const res = await bookingRepository.updateBookingStatusById(
@@ -187,11 +195,12 @@ class BookingResolver {
     ) {
         const booking = await bookingRepository.getBookingById(bookingId);
         if (booking.publisher_id !== ctx.userId) {
-            throw new Error('You are not authorized for this action.');
+            throw createError(403, 'You are not authorized for this action.');
         }
 
         if (booking.booking_status !== BookingStatus.PENDING_CONFIRMATION) {
-            throw new Error(
+            throw createError(
+                400,
                 `Booking with id ${bookingId} is not in pending confirmation state.`
             );
         }

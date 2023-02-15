@@ -4,6 +4,7 @@ import { Knex } from 'knex';
 import pgTsquery from 'pg-tsquery';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
+import { createError } from 'src/errors/errorParser';
 
 const queryEscaper = pgTsquery();
 
@@ -47,7 +48,10 @@ const decodePaginationToken = (
         config.pagination.secret
     ) as PaginationTokenPayload;
     if (data.type !== expectedType) {
-        throw new Error('Pagination token type is not valid for this query');
+        throw createError(
+            400,
+            'Pagination token type is not valid for this query'
+        );
     }
     return data;
 };
