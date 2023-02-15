@@ -19,13 +19,14 @@ import {
 import serviceRepository from '@repositories/serviceRepository';
 import { LoggedInContextType } from '@graphql/types';
 import userRepository from '@repositories/userRepository';
+import { createError } from 'src/errors/errorParser';
 
 const validateServiceModification = (
     ctx: LoggedInContextType,
     service: Service
 ) => {
     if (service.publisher_id !== ctx.userId && !ctx.isAdmin) {
-        throw new Error('You are not the publisher of this service');
+        throw createError(403, `You don't have permissions for this action`);
     }
 };
 
@@ -45,7 +46,7 @@ class ServiceResolver {
             return res;
         } catch (err: any) {
             if (err.code === '23505') {
-                throw new Error('DNI already in use');
+                throw createError(409, 'DNI already in use');
             }
             throw err;
         }

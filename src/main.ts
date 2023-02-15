@@ -6,6 +6,7 @@ import { buildContext } from '@util/contextUtil';
 import logger from '@util/logger';
 import config from '@config/default';
 import cors from 'cors';
+import { parseError } from './errors/errorParser';
 
 const { allowedOrigins } = config.server.cors;
 
@@ -23,7 +24,7 @@ app.get('/', async (req, res) => {
 
 app.use(
     '/graph',
-    graphqlHTTP(async (req) => {
+    graphqlHTTP(async (req, res) => {
         const context = buildContext(req.headers);
         return {
             schema: await schema,
@@ -31,8 +32,13 @@ app.use(
                 headerEditorEnabled: true,
             },
             context,
+            customFormatErrorFn: (err: any) => {
+                const { statusCode, message } = parseError(err);
+                res.statusCode = statusCode || 500;
+                return { ...err, message };
+            },
         };
-    }),
+    })
 );
 
 app.listen(config.server.port, () => {

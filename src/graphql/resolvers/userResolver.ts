@@ -18,6 +18,7 @@ import {
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials, LoggedInContextType } from '@graphql/types';
+import { createError } from 'src/errors/errorParser';
 
 @Resolver()
 class UserResolver {
@@ -25,7 +26,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async user(
         @Arg('id', { nullable: true }) id?: string,
-        @Arg('dni', { nullable: true }) dni?: string,
+        @Arg('dni', { nullable: true }) dni?: string
     ) {
         if (dni !== undefined) {
             const res = await userRepository.getUserByDNI(dni);
@@ -35,14 +36,14 @@ class UserResolver {
             const res = await userRepository.getUserById(id);
             return res;
         }
-        throw new Error('You must specify either DNI or id');
+        throw createError(400, 'You must specify either DNI or id');
     }
 
     @Query(() => PaginatedUserResponse)
     @Authorized(['ADMIN'])
     async users(
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number,
+        @Arg('first', { nullable: true }) pageSize?: number
     ) {
         const res = await userRepository.getUsers(paginationToken, pageSize);
         return res;
@@ -56,7 +57,7 @@ class UserResolver {
             return res;
         } catch (err: any) {
             if (err.code === '23505') {
-                throw new Error('DNI already in use');
+                throw createError(409, 'DNI already in use');
             }
             throw err;
         }
@@ -66,7 +67,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async updateUser(
         @Arg('id') id: string,
-        @Arg('update_args') updateArgs: UpdateUserArgs,
+        @Arg('update_args') updateArgs: UpdateUserArgs
     ) {
         const res = await userRepository.updateUserById(id, updateArgs);
         return res;

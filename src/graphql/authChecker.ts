@@ -10,6 +10,7 @@ import PublisherAuthChecker from '@graphql/authCheckers/publisherAuthChecker';
 import logger from '@util/logger';
 import AdminAuthChecker from '@graphql/authCheckers/adminAuthChecker';
 import BookingRolesAuthChecker from '@graphql/authCheckers/bookingRolesAuthChecker';
+import { createError } from 'src/errors/errorParser';
 
 const roleCheckers = {
     PUBLISHER: PublisherAuthChecker,
@@ -19,16 +20,14 @@ const roleCheckers = {
 
 const getAuthCheckerForRole = (role: RoleTypes): RoleChecker => {
     if (roleCheckers[role] === undefined) {
-        throw new Error(`Invalid role ${role}`);
+        throw createError(400, `Invalid role ${role}`);
     }
     return roleCheckers[role];
 };
 
 export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
-    {
-        root, args, context, info,
-    },
-    roles,
+    { root, args, context, info },
+    roles
 ) => {
     // Always check if user is logged in
     if (
