@@ -74,9 +74,8 @@ class Service {
 
     @Field(() => Int, {
         description: 'Maximum amount of time slots to reserve',
-        nullable: true,
     })
-        max_time?: number;
+        max_time!: number;
 
     @Field(() => BookingType)
         booking_type!: BookingType;
