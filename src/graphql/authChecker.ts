@@ -38,8 +38,9 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
             info,
         }))
     ) {
-        return false;
+        throw createError(401, 'Unauthenticated');
     }
+
     logger.debug('User deemed as logged in.');
     const loggedInContext = context as LoggedInContextType;
 
@@ -54,8 +55,9 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
             context: loggedInContext,
             info,
         });
-        if (!checkResult) return false;
+        if (!checkResult) throw createError(403, 'Unauthorized');
     }
+
     return true;
 };
 
