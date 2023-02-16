@@ -134,6 +134,11 @@ const getUsersMetrics = async (): Promise<UsersMetrics> => {
     };
 };
 
+const isUserBanned = async (userId: string): Promise<boolean> => {
+    const user = await getUserById(userId);
+    return user.is_banned;
+};
+
 export default {
     addUser,
     getUserByDNI,
@@ -141,4 +146,5 @@ export default {
     getUsers,
     updateUserById,
     getUsersMetrics,
+    isUserBanned,
 };

@@ -3,13 +3,14 @@ import { UniversityRole } from '@graphql/types';
 import { parse } from 'postgres-array';
 
 export type RawUser = {
-    id: string,
-    ts: Date,
-    dni: string,
-    roles: string,
-    can_publish_services: boolean,
-    is_admin: boolean,
-}
+    id: string;
+    ts: Date;
+    dni: string;
+    roles: string;
+    can_publish_services: boolean;
+    is_admin: boolean;
+    is_banned: boolean;
+};
 
 const adapt = (rawUser: RawUser): User => ({
     ...rawUser,

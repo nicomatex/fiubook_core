@@ -11,6 +11,7 @@ import logger from '@util/logger';
 import AdminAuthChecker from '@graphql/authCheckers/adminAuthChecker';
 import BookingRolesAuthChecker from '@graphql/authCheckers/bookingRolesAuthChecker';
 import { createError } from '@errors/errorParser';
+import userRepository from '@repositories/userRepository';
 
 const roleCheckers = {
     PUBLISHER: PublisherAuthChecker,
@@ -46,6 +47,12 @@ export const authChecker: AuthChecker<ContextType, RoleTypes> = async (
     logger.debug('User deemed as logged in.');
     const loggedInContext = context as LoggedInContextType;
 
+    const isUserBanned = await userRepository.isUserBanned(
+        loggedInContext.userId,
+    );
+    if (isUserBanned) {
+        throw createError(403, 'User is banned');
+    }
     // Check any other necessary roles
     // eslint-disable-next-line no-restricted-syntax
     for (const role of roles) {

@@ -40,7 +40,7 @@ class User {
         is_admin!: boolean;
 
     @Field(() => Boolean)
-        is_banned?: boolean;
+        is_banned!: boolean;
 }
 
 @ObjectType()
