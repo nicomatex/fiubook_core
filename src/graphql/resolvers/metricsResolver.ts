@@ -1,16 +1,21 @@
 /* eslint-disable class-methods-use-this */
-import { FieldResolver, Query, Resolver } from 'type-graphql';
+import {
+    Authorized, FieldResolver, Query, Resolver,
+} from 'type-graphql';
 
 import userRepository from '@repositories/userRepository';
 import {
+    BookingsMetrics,
     Metrics,
     ServicesMetrics,
     UsersMetrics,
 } from '@graphql/schemas/metrics';
 import serviceRepository from '@repositories/serviceRepository';
+import bookingRepository from '@repositories/bookingRepository';
 
 @Resolver(() => Metrics)
 class MetricsResolver {
+    @Authorized(['ADMIN'])
     @Query(() => Metrics)
     async metrics(): Promise<Metrics> {
         const metrics = {};
@@ -26,6 +31,12 @@ class MetricsResolver {
     @FieldResolver()
     async services(): Promise<ServicesMetrics> {
         const metrics = await serviceRepository.getServicesMetrics();
+        return metrics;
+    }
+
+    @FieldResolver()
+    async bookings(): Promise<BookingsMetrics> {
+        const metrics = await bookingRepository.getBookingsMetrics();
         return metrics;
     }
 }

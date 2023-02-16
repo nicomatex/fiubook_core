@@ -177,6 +177,47 @@ const updateBookingStatusById = async (
     return parsedBooking;
 };
 
+const getBookingsMetrics = async () => {
+    const bookingCount = parseInt(
+        (await connection('bookings').count())[0].count as string,
+        10,
+    );
+
+    const pendingBookingsCount = parseInt(
+        (
+            await connection('bookings')
+                .where({ booking_status: BookingStatus.PENDING_CONFIRMATION })
+                .count()
+        )[0].count as string,
+        10,
+    );
+
+    const confirmedBookingsCount = parseInt(
+        (
+            await connection('bookings')
+                .where({ booking_status: BookingStatus.CONFIRMED })
+                .count()
+        )[0].count as string,
+        10,
+    );
+
+    const cancelledBookingsCount = parseInt(
+        (
+            await connection('bookings')
+                .where({ booking_status: BookingStatus.CANCELLED })
+                .count()
+        )[0].count as string,
+        10,
+    );
+
+    return {
+        booking_count: bookingCount,
+        pending_bookings_count: pendingBookingsCount,
+        confirmed_bookings_count: confirmedBookingsCount,
+        cancelled_bookings_count: cancelledBookingsCount,
+    };
+};
+
 export default {
     getConflictingBookings,
     getBookingsByRequestorId,
@@ -186,4 +227,5 @@ export default {
     deleteBookingById,
     updateBookingStatusById,
     getBookings,
+    getBookingsMetrics,
 };

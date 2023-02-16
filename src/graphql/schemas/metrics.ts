@@ -43,7 +43,7 @@ class BookingsMetrics {
         pending_bookings_count!: number;
 
     @Field()
-        approved_bookings_count!: number;
+        confirmed_bookings_count!: number;
 
     @Field()
         cancelled_bookings_count!: number;
