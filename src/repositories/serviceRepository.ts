@@ -16,8 +16,11 @@ import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 import { createError } from '@errors/errorParser';
 import { BookingType } from '@graphql/types';
+import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
+
+const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/150/FFFFFF?text=Servicio';
 
 const addService = async (
     creationArgs: CreateServiceArgs,
@@ -27,6 +30,7 @@ const addService = async (
 
     const newService = {
         ...creationArgs,
+        image_url: creationArgs.image_url ?? DEFAULT_IMAGE_URL,
         id,
         publisher_id: publisherId,
     };
