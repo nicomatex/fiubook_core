@@ -1,5 +1,4 @@
 import { MaxLength } from 'class-validator';
-import { TypeInfo } from 'graphql';
 import {
     ClassType,
     Field,
@@ -9,7 +8,7 @@ import {
     ResolverData,
 } from 'type-graphql';
 
-type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES'
+type RoleTypes = 'ADMIN' | 'PUBLISHER' | 'BOOKING_ROLES';
 
 enum BookingType {
     AUTOMATIC = 'AUTOMATIC',
@@ -31,61 +30,61 @@ enum BookingStatus {
 @ObjectType()
 class PageInfo {
     @Field()
-        hasNextPage!: boolean;
+    hasNextPage!: boolean;
 
     @Field()
-        hasPreviousPage!: boolean;
+    hasPreviousPage!: boolean;
 
     @Field(() => String, { nullable: true })
-        startCursor?: string | null;
+    startCursor?: string | null;
 
     @Field(() => String, { nullable: true })
-        endCursor?: string | null;
+    endCursor?: string | null;
 }
 
 function EdgesType<TItem>(itemFieldValue: ClassType<TItem>) {
     @ObjectType({ isAbstract: true })
     abstract class EdgesTypeClass {
         @Field(() => itemFieldValue)
-            node!: TItem;
+        node!: TItem;
 
         @Field()
-            cursor!: String;
+        cursor!: String;
     }
 
     return EdgesTypeClass;
 }
 
 type LoggedInContextType = {
-    isLoggedIn: true
-    userId: string
-    roles: UniversityRole[]
-    canPublishServices: boolean
-    isAdmin: boolean
-}
+    isLoggedIn: true;
+    userId: string;
+    roles: UniversityRole[];
+    canPublishServices: boolean;
+    isAdmin: boolean;
+};
 
 type NotLoggedInContextType = {
-    isLoggedIn: false
-}
+    isLoggedIn: false;
+};
 
-type ContextType = LoggedInContextType | NotLoggedInContextType
+type ContextType = LoggedInContextType | NotLoggedInContextType;
 
 type RoleChecker = ({
     root,
     args,
     context,
     info,
-}: ResolverData<LoggedInContextType>) => Promise<boolean>
+}: ResolverData<LoggedInContextType>) => Promise<boolean>;
 
 @InputType()
 class Credentials {
     @Field()
     @MaxLength(128)
-        dni!: string;
+    dni!: string;
 
     @Field()
     @MaxLength(128)
-        password!: string;
+    password!: string;
 }
 
 // Required to use these enums in Type-GraphQL.
