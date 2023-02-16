@@ -234,6 +234,20 @@ class BookingResolver {
         );
         return publisher;
     }
+
+    @Query(() => PaginatedBookingResponse)
+    @Authorized(['ADMIN'])
+    async bookings(
+        @Ctx() ctx: LoggedInContextType,
+        @Arg('after', { nullable: true }) paginationToken?: string,
+        @Arg('first', { nullable: true }) pageSize?: number,
+    ) {
+        const res = await bookingRepository.getBookings(
+            paginationToken,
+            pageSize,
+        );
+        return res;
+    }
 }
 
 export default BookingResolver;

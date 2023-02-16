@@ -64,6 +64,28 @@ const getBookingsByRequestorId = async (
     );
 };
 
+const getBookings = async (paginationToken?: string, pageSize?: number) => {
+    const query = connection('bookings')
+        .orderBy('ts', 'desc')
+        .orderBy('id')
+        .modify(
+            withPaginationToken,
+            PaginatedQueryType.Bookings,
+            paginationToken,
+            true,
+        )
+        .limit(pageSize ?? config.pagination.pageSize);
+
+    const data = await query;
+    const parsedData = data.map(adaptBooking);
+
+    return genPaginatedResponse(
+        parsedData,
+        pageSize ?? config.pagination.pageSize,
+        PaginatedQueryType.Bookings,
+    );
+};
+
 const getBookingsByPublisherId = async (
     publisherId: string,
     paginationToken?: string,
@@ -163,4 +185,5 @@ export default {
     getBookingById,
     deleteBookingById,
     updateBookingStatusById,
+    getBookings,
 };
