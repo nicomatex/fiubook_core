@@ -12,7 +12,7 @@ import {
     withPaginationToken,
 } from '@util/dbUtil';
 import adaptUser from '@repositories/dataAdapters/userDataAdapter';
-import { createError } from 'src/errors/errorParser';
+import { createError } from '@errors/errorParser';
 
 const connection = knex({ ...config.knex });
 
@@ -47,8 +47,7 @@ const getUserByDNI = async (dni: string): Promise<User | null> => {
 
 const getUserById = async (id: string): Promise<User> => {
     const res = await connection('users').where({ id });
-    if (res.length === 0)
-        throw createError(404, `User with id ${id} not found`);
+    if (res.length === 0) throw createError(404, `User with id ${id} not found`);
     const user = res[0];
 
     const parsedUser = adaptUser(user);
@@ -57,7 +56,7 @@ const getUserById = async (id: string): Promise<User> => {
 
 const getUsers = async (
     paginationToken?: string,
-    pageSize?: number
+    pageSize?: number,
 ): Promise<PaginatedUserResponse> => {
     const query = connection('users')
         .orderBy('ts')
@@ -72,7 +71,7 @@ const getUsers = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Users
+        PaginatedQueryType.Users,
     );
 };
 
@@ -83,8 +82,7 @@ const updateUserById = async (userId: string, updateArgs: UpdateUserArgs) => {
         .returning('*');
 
     const res = await query;
-    if (res.length === 0)
-        throw createError(404, `User with id ${userId} not found`);
+    if (res.length === 0) throw createError(404, `User with id ${userId} not found`);
     const user = res[0];
 
     const parsedUser = adaptUser(user);

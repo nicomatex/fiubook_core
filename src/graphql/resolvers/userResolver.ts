@@ -18,7 +18,7 @@ import {
 import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials, LoggedInContextType } from '@graphql/types';
-import { createError } from 'src/errors/errorParser';
+import { createError } from '@errors/errorParser';
 
 @Resolver()
 class UserResolver {
@@ -26,7 +26,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async user(
         @Arg('id', { nullable: true }) id?: string,
-        @Arg('dni', { nullable: true }) dni?: string
+        @Arg('dni', { nullable: true }) dni?: string,
     ) {
         if (dni !== undefined) {
             const res = await userRepository.getUserByDNI(dni);
@@ -43,7 +43,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async users(
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await userRepository.getUsers(paginationToken, pageSize);
         return res;
@@ -67,7 +67,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async updateUser(
         @Arg('id') id: string,
-        @Arg('update_args') updateArgs: UpdateUserArgs
+        @Arg('update_args') updateArgs: UpdateUserArgs,
     ) {
         const res = await userRepository.updateUserById(id, updateArgs);
         return res;

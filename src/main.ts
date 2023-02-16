@@ -6,7 +6,7 @@ import { buildContext } from '@util/contextUtil';
 import logger from '@util/logger';
 import config from '@config/default';
 import cors from 'cors';
-import { parseError } from './errors/errorParser';
+import { parseError } from '@errors/errorParser';
 
 const { allowedOrigins } = config.server.cors;
 
@@ -38,7 +38,7 @@ app.use(
                 return { ...err, message };
             },
         };
-    })
+    }),
 );
 
 app.listen(config.server.port, () => {

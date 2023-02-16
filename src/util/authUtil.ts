@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '@config/default';
 import { User } from '@graphql/schemas/user';
 import { LoggedInContextType, UniversityRole } from '@graphql/types';
-import { createError } from 'src/errors/errorParser';
+import { createError } from '@errors/errorParser';
 
 const createSessionToken = (user: User): string => {
     const tokenPayload = {
@@ -44,7 +44,7 @@ const decodeSessionToken = (token: string): LoggedInContextType => {
 // TODO: unmock this implementation
 const checkFIUBACredentials = async (
     dni: string,
-    password: string
+    password: string,
 ): Promise<boolean> => true;
 
 export { createSessionToken, checkFIUBACredentials, decodeSessionToken };

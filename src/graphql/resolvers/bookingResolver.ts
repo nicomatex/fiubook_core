@@ -22,7 +22,7 @@ import bookingRepository from '@repositories/bookingRepository';
 import userRepository from '@repositories/userRepository';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
-import { createError } from 'src/errors/errorParser';
+import { createError } from '@errors/errorParser';
 
 const validateBookingDateLimits = ({
     start_date: startDate,
@@ -34,7 +34,7 @@ const validateBookingDateLimits = ({
     if (endDate <= startDate) {
         throw createError(
             400,
-            'End date cannot be equal or earlier than start date.'
+            'End date cannot be equal or earlier than start date.',
         );
     }
 };
@@ -47,20 +47,20 @@ const validateNoConflictingBookings = async ({
     const conflictingBookings = await bookingRepository.getConflictingBookings(
         serviceId,
         startDate,
-        endDate
+        endDate,
     );
 
     if (conflictingBookings.length > 0) {
         throw createError(
             409,
-            'There are conflicts with other bookings in the selected time interval.'
+            'There are conflicts with other bookings in the selected time interval.',
         );
     }
 };
 
 const validateBookingSlot = (
     { start_date: startDate, end_date: endDate }: CreateBookingArgs,
-    { granularity, max_time: maxTime }: Service
+    { granularity, max_time: maxTime }: Service,
 ) => {
     const granularityMs = granularity * 1000;
     const startTime = startDate.getTime();
@@ -69,7 +69,7 @@ const validateBookingSlot = (
     if ((endTime - startTime) % granularityMs > 0) {
         throw createError(
             400,
-            `Booking slot duration must be a multiple of the granularity (${granularity} seconds).`
+            `Booking slot duration must be a multiple of the granularity (${granularity} seconds).`,
         );
     }
 
@@ -77,7 +77,7 @@ const validateBookingSlot = (
     if (maxTime && bookingLengthInSlots > maxTime) {
         throw createError(
             400,
-            `Booking slot length (${bookingLengthInSlots} slots of ${granularity} seconds) exceeds maximum amount of slots (${maxTime} slots).`
+            `Booking slot length (${bookingLengthInSlots} slots of ${granularity} seconds) exceeds maximum amount of slots (${maxTime} slots).`,
         );
     }
 };
@@ -88,23 +88,22 @@ class BookingResolver {
     @Mutation(() => CreateBookingResponse)
     async createBooking(
         @Arg('creationArgs') creationArgs: CreateBookingArgs,
-        @Ctx() ctx: LoggedInContextType
+        @Ctx() ctx: LoggedInContextType,
     ): Promise<CreateBookingResponse> {
         validateBookingDateLimits(creationArgs);
         await validateNoConflictingBookings(creationArgs);
 
         const requestedService = await serviceRepository.getServiceById(
-            creationArgs.service_id
+            creationArgs.service_id,
         );
 
         validateBookingSlot(creationArgs, requestedService);
 
-        const insertedBookingEdge: BookingEdgesType =
-            await bookingRepository.createBooking(
-                creationArgs,
-                requestedService,
-                ctx.userId
-            );
+        const insertedBookingEdge: BookingEdgesType = await bookingRepository.createBooking(
+            creationArgs,
+            requestedService,
+            ctx.userId,
+        );
 
         return { bookingEdge: insertedBookingEdge };
     }
@@ -114,21 +113,20 @@ class BookingResolver {
     async conflictingBookings(
         @Arg('service_id') serviceId: string,
         @Arg('start_date') startDate: Date,
-        @Arg('end_date') endDate: Date
+        @Arg('end_date') endDate: Date,
     ): Promise<Booking[]> {
         if (endDate <= startDate) {
             throw createError(
                 400,
-                'End date cannot be equal or earlier than start date.'
+                'End date cannot be equal or earlier than start date.',
             );
         }
 
-        const conflictingBookings =
-            await bookingRepository.getConflictingBookings(
-                serviceId,
-                startDate,
-                endDate
-            );
+        const conflictingBookings = await bookingRepository.getConflictingBookings(
+            serviceId,
+            startDate,
+            endDate,
+        );
 
         return conflictingBookings;
     }
@@ -138,12 +136,12 @@ class BookingResolver {
     async myBookings(
         @Ctx() ctx: LoggedInContextType,
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await bookingRepository.getBookingsByRequestorId(
             ctx.userId,
             paginationToken,
-            pageSize
+            pageSize,
         );
         return res;
     }
@@ -152,21 +150,21 @@ class BookingResolver {
     @Authorized()
     async cancelBooking(
         @Arg('booking_id') bookingId: string,
-        @Ctx() ctx: LoggedInContextType
+        @Ctx() ctx: LoggedInContextType,
     ) {
         const booking = await bookingRepository.getBookingById(bookingId);
 
         // Both the publisher and the requestor may cancel
         if (
-            booking.requestor_id !== ctx.userId &&
-            booking.publisher_id !== ctx.userId
+            booking.requestor_id !== ctx.userId
+            && booking.publisher_id !== ctx.userId
         ) {
             throw createError(403, 'You are not authorized for this action.');
         }
 
         const res = await bookingRepository.updateBookingStatusById(
             bookingId,
-            BookingStatus.CANCELLED
+            BookingStatus.CANCELLED,
         );
         return res;
     }
@@ -176,12 +174,12 @@ class BookingResolver {
     async myBookingsForPublisher(
         @Ctx() ctx: LoggedInContextType,
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number
+        @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await bookingRepository.getBookingsByPublisherId(
             ctx.userId,
             paginationToken,
-            pageSize
+            pageSize,
         );
         return res;
     }
@@ -191,7 +189,7 @@ class BookingResolver {
     async acceptBooking(
         @Arg('booking_id') bookingId: string,
         @Arg('accept') accept: boolean,
-        @Ctx() ctx: LoggedInContextType
+        @Ctx() ctx: LoggedInContextType,
     ) {
         const booking = await bookingRepository.getBookingById(bookingId);
         if (booking.publisher_id !== ctx.userId) {
@@ -201,13 +199,13 @@ class BookingResolver {
         if (booking.booking_status !== BookingStatus.PENDING_CONFIRMATION) {
             throw createError(
                 400,
-                `Booking with id ${bookingId} is not in pending confirmation state.`
+                `Booking with id ${bookingId} is not in pending confirmation state.`,
             );
         }
 
         const res = await bookingRepository.updateBookingStatusById(
             bookingId,
-            accept ? BookingStatus.CONFIRMED : BookingStatus.CANCELLED
+            accept ? BookingStatus.CONFIRMED : BookingStatus.CANCELLED,
         );
 
         return res;
@@ -216,7 +214,7 @@ class BookingResolver {
     @FieldResolver()
     async service(@Root() booking: Booking) {
         const service = await serviceRepository.getServiceById(
-            booking.service_id
+            booking.service_id,
         );
         return service;
     }
@@ -224,7 +222,7 @@ class BookingResolver {
     @FieldResolver(() => User)
     async requestor(@Root() booking: Booking) {
         const requestor = await userRepository.getUserById(
-            booking.requestor_id
+            booking.requestor_id,
         );
         return requestor;
     }
@@ -232,7 +230,7 @@ class BookingResolver {
     @FieldResolver(() => User)
     async publisher(@Root() booking: Booking) {
         const publisher = await userRepository.getUserById(
-            booking.publisher_id
+            booking.publisher_id,
         );
         return publisher;
     }

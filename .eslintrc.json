@@ -23,7 +23,8 @@
                     ["@config", "./config"],
                     ["@graphql", "./src/graphql"],
                     ["@repositories", "./src/repositories"],
-                    ["@util", "./src/util"]
+                    ["@util", "./src/util"],
+                    ["@errors", "./src/errors"]
                 ],
                 "extensions": [".ts", ".js", ".jsx", ".json"]
             }

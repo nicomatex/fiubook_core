@@ -4,7 +4,7 @@ import { Knex } from 'knex';
 import pgTsquery from 'pg-tsquery';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
-import { createError } from 'src/errors/errorParser';
+import { createError } from '@errors/errorParser';
 
 const queryEscaper = pgTsquery();
 
@@ -26,7 +26,7 @@ type PaginableDataType = Service | User;
 const genPaginationToken = (
     id: string,
     ts: Date,
-    type: PaginatedQueryType
+    type: PaginatedQueryType,
 ): string => {
     const token = jwt.sign(
         {
@@ -34,23 +34,23 @@ const genPaginationToken = (
             ts,
             type,
         },
-        config.pagination.secret
+        config.pagination.secret,
     );
     return token;
 };
 
 const decodePaginationToken = (
     token: string,
-    expectedType: PaginatedQueryType
+    expectedType: PaginatedQueryType,
 ): PaginationTokenPayload => {
     const data = jwt.verify(
         token,
-        config.pagination.secret
+        config.pagination.secret,
     ) as PaginationTokenPayload;
     if (data.type !== expectedType) {
         throw createError(
             400,
-            'Pagination token type is not valid for this query'
+            'Pagination token type is not valid for this query',
         );
     }
     return data;
@@ -60,25 +60,25 @@ const withPaginationToken = (
     queryBuilder: Knex.QueryBuilder,
     paginationTokenType: PaginatedQueryType,
     paginationToken?: string,
-    dateOrderingDesc?: boolean
+    dateOrderingDesc?: boolean,
 ) => {
     if (paginationToken === undefined) return;
     const paginationInfo = decodePaginationToken(
         paginationToken,
-        paginationTokenType
+        paginationTokenType,
     );
     const { ts: previousPageLastTs, id: previousPageLastId } = paginationInfo;
     queryBuilder.whereRaw(
         `(ts, id) ${
             dateOrderingDesc ? '<' : '>'
-        } ('${previousPageLastTs}','${previousPageLastId}')`
+        } ('${previousPageLastTs}','${previousPageLastId}')`,
     );
 };
 
 const withQueryTerm = (
     queryBuilder: Knex.QueryBuilder,
     tsColumn: string,
-    queryTerm?: string
+    queryTerm?: string,
 ) => {
     if (queryTerm === undefined) return;
     queryBuilder.whereRaw("?? @@ to_tsquery('spanish',?)", [
@@ -89,18 +89,16 @@ const withQueryTerm = (
 
 const genEdge = <T extends PaginableDataType>(
     item: T,
-    dataType: PaginatedQueryType
-) => {
-    return {
+    dataType: PaginatedQueryType,
+) => ({
         node: item,
         cursor: genPaginationToken(item.id, item.ts, dataType),
-    };
-};
+    });
 
 const genPaginatedResponse = <T extends PaginableDataType>(
     data: T[],
     last: number,
-    dataType: PaginatedQueryType
+    dataType: PaginatedQueryType,
 ) => {
     const edges = data.map((item) => genEdge(item, dataType));
 
