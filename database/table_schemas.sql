@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS services(
         booking_type BOOKING_TYPE NOT NULL,
         allowed_roles UNIVERSITY_ROLE[] NOT NULL,
         tags VARCHAR(128)[] DEFAULT '{}',
+        image_url VARCHAR(512) NOT NULL,
         search_index tsvector GENERATED ALWAYS AS (to_tsvector('spanish', name || ' ' || description)) STORED -- Index column for term searching
 );
 

@@ -13,6 +13,7 @@ export type RawService = {
     booking_type: string;
     allowed_roles: string;
     tags: string[];
+    image_url: string;
 };
 
 const adapt = (rawService: RawService): Service => ({

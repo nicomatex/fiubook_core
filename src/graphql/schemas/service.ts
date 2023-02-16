@@ -32,6 +32,9 @@ export class CreateServiceArgs {
 
     @Field(() => [String])
         tags!: string[];
+
+    @Field(() => String, { nullable: true })
+        image_url?: string;
 }
 
 @InputType()
@@ -56,6 +59,9 @@ export class UpdateServiceArgs {
 
     @Field(() => [String], { nullable: true })
         tags?: string[];
+
+    @Field(() => String, { nullable: true })
+        image_url?: string;
 }
 
 @ObjectType()
@@ -77,6 +83,9 @@ class Service {
 
     @Field(() => [String])
         tags!: string[];
+
+    @Field(() => String)
+        image_url!: string;
 
     @Field(() => Int, { description: 'Time slot granularity in seconds' })
         granularity!: number;

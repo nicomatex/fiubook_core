@@ -20,6 +20,8 @@ import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
 
+const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/150/FFFFFF?text=Servicio';
+
 const addService = async (
     creationArgs: CreateServiceArgs,
     publisherId: string,
@@ -28,6 +30,7 @@ const addService = async (
 
     const newService = {
         ...creationArgs,
+        image_url: creationArgs.image_url ?? DEFAULT_IMAGE_URL,
         id,
         publisher_id: publisherId,
     };
