@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 import { createError } from '@errors/errorParser';
 import { BookingType } from '@graphql/types';
+import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
 

@@ -29,6 +29,9 @@ export class CreateServiceArgs {
 
     @Field(() => [UniversityRole])
         allowed_roles!: UniversityRole[];
+
+    @Field(() => [String])
+        tags!: string[];
 }
 
 @InputType()
@@ -50,6 +53,9 @@ export class UpdateServiceArgs {
 
     @Field(() => [UniversityRole], { nullable: true })
         allowed_roles?: UniversityRole[];
+
+    @Field(() => [String], { nullable: true })
+        tags?: string[];
 }
 
 @ObjectType()
@@ -68,6 +74,9 @@ class Service {
 
     @Field(() => String)
         description!: string;
+
+    @Field(() => [String])
+        tags!: string[];
 
     @Field(() => Int, { description: 'Time slot granularity in seconds' })
         granularity!: number;
