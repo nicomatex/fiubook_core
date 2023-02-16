@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users(
     dni VARCHAR(128) NOT NULL UNIQUE,
     roles UNIVERSITY_ROLE[] NOT NULL,
     can_publish_services BOOLEAN NOT NULL,
-    is_admin BOOLEAN NOT NULL
+    is_admin BOOLEAN NOT NULL,
+    is_banned BOOLEAN NOT NULL DEFAULT false
 );
 
 -- Index on timestamp used for pagination
@@ -34,7 +35,7 @@ CREATE INDEX search_idx_services ON services USING GIN (search_index); -- Index 
 CREATE TABLE IF NOT EXISTS bookings(
     id CHAR(36) PRIMARY KEY,
     ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
-    service_id CHAR(36) REFERENCES services(id),
+    service_id CHAR(36) REFERENCES services(id) ON DELETE CASCADE,
     requestor_id CHAR(36) REFERENCES users(id),
     publisher_id CHAR(36) REFERENCES users(id),
     start_date TIMESTAMPTZ NOT NULL,
