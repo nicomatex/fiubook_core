@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS bookings(
     service_id CHAR(36) REFERENCES services(id),
     requestor_id CHAR(36) REFERENCES users(id),
     publisher_id CHAR(36) REFERENCES users(id),
-    start_date TIMESTAMPTZ NOT NULL, 
+    start_date TIMESTAMPTZ NOT NULL,
     end_date TIMESTAMPTZ NOT NULL,
     booking_status BOOKING_STATUS NOT NULL
 );
