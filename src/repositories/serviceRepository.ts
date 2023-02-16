@@ -15,6 +15,7 @@ import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 import { createError } from '@errors/errorParser';
+import { BookingType } from '@graphql/types';
 
 const connection = knex({ ...config.knex });
 
@@ -138,6 +139,38 @@ const deleteServiceById = async (serviceId: string) => {
     return parsedService;
 };
 
+const getServicesMetrics = async () => {
+    const serviceCount = parseInt(
+        (await connection('services').count())[0].count as string,
+        10,
+    );
+
+    const automaticConfirmationServicesCount = parseInt(
+        (
+            await connection('services')
+                .where({ booking_type: BookingType.AUTOMATIC })
+                .count()
+        )[0].count as string,
+        10,
+    );
+
+    const manualConfirmationServicesCount = parseInt(
+        (
+            await connection('services')
+                .where({ booking_type: BookingType.REQUIRES_CONFIRMATION })
+                .count()
+        )[0].count as string,
+        10,
+    );
+
+    return {
+        service_count: serviceCount,
+        automatic_confirmation_services_count:
+            automaticConfirmationServicesCount,
+        manual_confirmation_services_count: manualConfirmationServicesCount,
+    };
+};
+
 export default {
     addService,
     deleteServiceById,
@@ -145,4 +178,5 @@ export default {
     getServicesByPublisherId,
     getServiceById,
     updateServiceById,
+    getServicesMetrics,
 };
