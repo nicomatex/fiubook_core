@@ -13,6 +13,8 @@ import {
 } from '@util/dbUtil';
 import adaptUser from '@repositories/dataAdapters/userDataAdapter';
 import { createError } from '@errors/errorParser';
+import { UsersMetrics } from '@graphql/schemas/metrics';
+import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
 
@@ -90,10 +92,53 @@ const updateUserById = async (userId: string, updateArgs: UpdateUserArgs) => {
     return parsedUser;
 };
 
+const getUsersMetrics = async (): Promise<UsersMetrics> => {
+    const userCount = parseInt(
+        (await connection('users').count())[0].count as string,
+        10,
+    );
+
+    logger.info(`User count is ${JSON.stringify(userCount)}`);
+
+    const professorCount = parseInt(
+        (
+            await connection('users').whereRaw("'PROFESSOR'=ANY(roles)").count()
+        )[0].count as string,
+        10,
+    );
+
+    const studentCount = parseInt(
+        (await connection('users').whereRaw("'STUDENT'=ANY(roles)").count())[0]
+            .count as string,
+        10,
+    );
+
+    const nodoCount = parseInt(
+        (await connection('users').whereRaw("'NODO'=ANY(roles)").count())[0]
+            .count as string,
+        10,
+    );
+
+    const bannedCount = parseInt(
+        (await connection('users').where({ is_banned: true }).count())[0]
+            .count as string,
+        10,
+    );
+
+    return {
+        user_count: userCount,
+        professor_count: professorCount,
+        student_count: studentCount,
+        nodo_count: nodoCount,
+        banned_count: bannedCount,
+    };
+};
+
 export default {
     addUser,
     getUserByDNI,
     getUserById,
     getUsers,
     updateUserById,
+    getUsersMetrics,
 };
