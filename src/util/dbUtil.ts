@@ -5,6 +5,7 @@ import pgTsquery from 'pg-tsquery';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
 import { createError } from '@errors/errorParser';
+import { UniversityRole } from '@graphql/types';
 
 const queryEscaper = pgTsquery();
 
@@ -75,6 +76,16 @@ const withPaginationToken = (
     );
 };
 
+const forRoles = (
+    queryBuilder: Knex.QueryBuilder,
+    isAdmin: boolean,
+    roles?: UniversityRole[],
+) => {
+    if (roles === undefined || roles.length === 0 || isAdmin) return;
+
+    queryBuilder.whereRaw(`allowed_roles && '{${roles.join(',')}}'`);
+};
+
 const withQueryTerm = (
     queryBuilder: Knex.QueryBuilder,
     tsColumn: string,
@@ -123,4 +134,5 @@ export {
     withPaginationToken,
     withQueryTerm,
     genPaginatedResponse,
+    forRoles,
 };

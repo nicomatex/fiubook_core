@@ -6,6 +6,7 @@ import {
     UpdateServiceArgs,
 } from '@graphql/schemas/service';
 import {
+    forRoles,
     genPaginatedResponse,
     PaginatedQueryType,
     withPaginationToken,
@@ -15,7 +16,7 @@ import knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 import { createError } from '@errors/errorParser';
-import { BookingType } from '@graphql/types';
+import { BookingType, UniversityRole } from '@graphql/types';
 import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
@@ -45,9 +46,11 @@ const addService = async (
 };
 
 const getServices = async (
+    isAdmin: boolean,
     paginationToken?: string,
     queryTerm?: string,
     pageSize?: number,
+    roles?: UniversityRole[],
 ): Promise<PaginatedServiceResponse> => {
     const query = connection('services')
         .orderBy('ts')
@@ -58,6 +61,7 @@ const getServices = async (
             paginationToken,
         )
         .modify(withQueryTerm, 'search_index', queryTerm)
+        .modify(forRoles, isAdmin, roles)
         .limit(pageSize ?? config.pagination.pageSize);
 
     const data = await query;
