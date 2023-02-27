@@ -26,7 +26,7 @@ const validateServiceModification = (
     service: Service,
 ) => {
     if (service.publisher_id !== ctx.userId && !ctx.isAdmin) {
-        throw createError(403, 'You don\'t have permissions for this action');
+        throw createError(403, "You don't have permissions for this action");
     }
 };
 
@@ -55,14 +55,17 @@ class ServiceResolver {
     @Query(() => PaginatedServiceResponse)
     @Authorized()
     async services(
+        @Ctx() ctx: LoggedInContextType,
         @Arg('after', { nullable: true }) paginationToken?: string,
         @Arg('query_term', { nullable: true }) queryTerm?: string,
         @Arg('first', { nullable: true }) pageSize?: number,
     ) {
         const res = await serviceRepository.getServices(
+            ctx.isAdmin,
             paginationToken,
             queryTerm,
             pageSize,
+            ctx.roles,
         );
         return res;
     }
