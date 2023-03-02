@@ -60,23 +60,24 @@ const getUsers = async (
     paginationToken?: string,
     pageSize?: number,
 ): Promise<PaginatedUserResponse> => {
+    const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('users')
         .orderBy('ts')
         .orderBy('id')
         .modify(withPaginationToken, PaginatedQueryType.Users, paginationToken)
-        .limit(pageSize ?? config.pagination.pageSize);
+        .limit(coalescedPageSize + 1);
 
     const countQuery = connection('users').count();
 
     const totalCount = parseInt((await countQuery)[0].count as string, 10);
 
     const data = await query;
-
-    const parsedData = data.map(adaptUser);
+    const returnedCount = data.length;
+    const parsedData = data.slice(0, coalescedPageSize).map(adaptUser);
 
     return genPaginatedResponse(
         parsedData,
-        pageSize ?? config.pagination.pageSize,
+        returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Users,
         totalCount,
     );
