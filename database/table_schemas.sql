@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS services(
         allowed_roles UNIVERSITY_ROLE[] NOT NULL,
         tags VARCHAR(128)[] DEFAULT '{}',
         image_url VARCHAR(512) NOT NULL,
-        search_index tsvector GENERATED ALWAYS AS (to_tsvector('spanish', name || ' ' || description)) STORED -- Index column for term searching
+        search_index tsvector GENERATED ALWAYS AS (to_tsvector('spanish', name || ' ' || description || ' ' || array_to_string(tags, ' '))) STORED -- Index column for term searching
 );
 
 -- Index on timestamp used for pagination
