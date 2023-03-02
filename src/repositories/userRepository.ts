@@ -66,6 +66,10 @@ const getUsers = async (
         .modify(withPaginationToken, PaginatedQueryType.Users, paginationToken)
         .limit(pageSize ?? config.pagination.pageSize);
 
+    const countQuery = connection('users').count();
+
+    const totalCount = parseInt((await countQuery)[0].count as string, 10);
+
     const data = await query;
 
     const parsedData = data.map(adaptUser);
@@ -74,6 +78,7 @@ const getUsers = async (
         parsedData,
         pageSize ?? config.pagination.pageSize,
         PaginatedQueryType.Users,
+        totalCount,
     );
 };
 
