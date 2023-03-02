@@ -4,6 +4,7 @@ import { BookingEdgesType, CreateBookingArgs } from '@graphql/schemas/booking';
 import knex from 'knex';
 import { Service } from '@graphql/schemas/service';
 import {
+    forServiceIds,
     genEdge,
     genPaginatedResponse,
     PaginatedQueryType,
@@ -39,6 +40,7 @@ const getConflictingBookings = async (
 
 const getBookingsByRequestorId = async (
     requestorId: string,
+    relevantServiceIds: string[] | null,
     paginationToken?: string,
     pageSize?: number,
 ) => {
@@ -52,6 +54,7 @@ const getBookingsByRequestorId = async (
             paginationToken,
             true,
         )
+        .modify(forServiceIds, relevantServiceIds)
         .limit(pageSize ?? config.pagination.pageSize);
 
     const data = await query;
@@ -88,6 +91,7 @@ const getBookings = async (paginationToken?: string, pageSize?: number) => {
 
 const getBookingsByPublisherId = async (
     publisherId: string,
+    relevantServiceIds: string[] | null,
     paginationToken?: string,
     pageSize?: number,
 ) => {
@@ -101,6 +105,7 @@ const getBookingsByPublisherId = async (
             paginationToken,
             true,
         )
+        .modify(forServiceIds, relevantServiceIds)
         .limit(pageSize ?? config.pagination.pageSize);
 
     const data = await query;

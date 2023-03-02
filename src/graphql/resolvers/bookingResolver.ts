@@ -138,10 +138,25 @@ class BookingResolver {
     async myBookings(
         @Ctx() ctx: LoggedInContextType,
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number
+        @Arg('first', { nullable: true }) pageSize?: number,
+        @Arg('query_term', { nullable: true }) queryTerm?: string,
     ) {
+        let relevantServiceIds: string[] | null = null;
+        if (queryTerm) {
+            // TODO: this could be more efficient
+            relevantServiceIds = (
+                await serviceRepository.getServices(
+                    ctx.isAdmin,
+                    undefined,
+                    queryTerm,
+                    1000,
+                    ctx.roles,
+                )
+            ).edges.map((edge) => edge.node.id);
+        }
         const res = await bookingRepository.getBookingsByRequestorId(
             ctx.userId,
+            relevantServiceIds,
             paginationToken,
             pageSize
         );
@@ -177,10 +192,25 @@ class BookingResolver {
     async myBookingsForPublisher(
         @Ctx() ctx: LoggedInContextType,
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number
+        @Arg('first', { nullable: true }) pageSize?: number,
+        @Arg('query_term', { nullable: true }) queryTerm?: string,
     ) {
+        let relevantServiceIds: string[] | null = null;
+        if (queryTerm) {
+            // TODO: this could be more efficient
+            relevantServiceIds = (
+                await serviceRepository.getServices(
+                    ctx.isAdmin,
+                    undefined,
+                    queryTerm,
+                    1000,
+                    ctx.roles,
+                )
+            ).edges.map((edge) => edge.node.id);
+        }
         const res = await bookingRepository.getBookingsByPublisherId(
             ctx.userId,
+            relevantServiceIds,
             paginationToken,
             pageSize
         );

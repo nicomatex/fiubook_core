@@ -78,7 +78,8 @@ const getServices = async (
 const getServicesByPublisherId = async (
     userId: string,
     paginationToken?: string,
-    pageSize?: number
+    queryTerm?: string,
+    pageSize?: number,
 ) => {
     const query = connection('services')
         .where({ publisher_id: userId })
@@ -89,6 +90,7 @@ const getServicesByPublisherId = async (
             PaginatedQueryType.Services,
             paginationToken
         )
+        .modify(withQueryTerm, 'search_index', queryTerm)
         .limit(pageSize ?? config.pagination.pageSize);
 
     const data = await query;
