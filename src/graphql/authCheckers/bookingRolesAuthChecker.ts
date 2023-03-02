@@ -6,17 +6,22 @@ import logger from '@util/logger';
 import { ResolverData } from 'type-graphql';
 
 const BookingRolesAuthChecker = async ({
-    context, args,
+    context,
+    args,
 }: ResolverData<LoggedInContextType>): Promise<boolean> => {
-    const typedArgs = args as {creationArgs: CreateBookingArgs};
+    const typedArgs = args as { creationArgs: CreateBookingArgs };
 
-    const service = await serviceRepository
-        .getServiceById(typedArgs.creationArgs.service_id) as Service;
+    const service = (await serviceRepository.getServiceById(
+        typedArgs.creationArgs.service_id,
+    )) as Service;
 
     logger.debug(JSON.stringify(service.allowed_roles));
     logger.debug(JSON.stringify(context.roles));
 
-    return context.roles.some((userRole) => service.allowed_roles.includes(userRole));
+    return (
+        // eslint-disable-next-line max-len
+        context.roles.some((userRole) => service.allowed_roles.includes(userRole)) || context.isAdmin
+    );
 };
 
 export default BookingRolesAuthChecker;
