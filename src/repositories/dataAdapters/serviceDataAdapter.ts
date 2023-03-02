@@ -11,6 +11,7 @@ export type RawService = {
     granularity: number;
     max_time: number;
     booking_type: string;
+    returnable: boolean;
     allowed_roles: string;
     tags: string[];
     image_url: string;
