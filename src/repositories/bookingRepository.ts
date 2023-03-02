@@ -44,6 +44,7 @@ const getBookingsByRequestorId = async (
     paginationToken?: string,
     pageSize?: number,
 ) => {
+    const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('bookings')
         .where({ requestor_id: requestorId })
         .orderBy('ts', 'desc')
@@ -55,7 +56,7 @@ const getBookingsByRequestorId = async (
             true,
         )
         .modify(forServiceIds, relevantServiceIds)
-        .limit(pageSize ?? config.pagination.pageSize);
+        .limit(coalescedPageSize + 1);
 
     const countQuery = connection('bookings')
         .where({ requestor_id: requestorId })
@@ -65,17 +66,20 @@ const getBookingsByRequestorId = async (
     const totalCount = parseInt((await countQuery)[0].count as string, 10);
 
     const data = await query;
-    const parsedData = data.map(adaptBooking);
+
+    const returnedCount = data.length;
+    const parsedData = data.slice(0, coalescedPageSize).map(adaptBooking);
 
     return genPaginatedResponse(
         parsedData,
-        pageSize ?? config.pagination.pageSize,
+        returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Bookings,
         totalCount,
     );
 };
 
 const getBookings = async (paginationToken?: string, pageSize?: number) => {
+    const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('bookings')
         .orderBy('ts', 'desc')
         .orderBy('id')
@@ -85,18 +89,20 @@ const getBookings = async (paginationToken?: string, pageSize?: number) => {
             paginationToken,
             true,
         )
-        .limit(pageSize ?? config.pagination.pageSize);
+        .limit(coalescedPageSize + 1);
 
     const countQuery = connection('bookings').count();
 
     const totalCount = parseInt((await countQuery)[0].count as string, 10);
 
     const data = await query;
-    const parsedData = data.map(adaptBooking);
+
+    const returnedCount = data.length;
+    const parsedData = data.slice(0, coalescedPageSize).map(adaptBooking);
 
     return genPaginatedResponse(
         parsedData,
-        pageSize ?? config.pagination.pageSize,
+        returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Bookings,
         totalCount,
     );
@@ -108,6 +114,7 @@ const getBookingsByPublisherId = async (
     paginationToken?: string,
     pageSize?: number,
 ) => {
+    const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('bookings')
         .where({ publisher_id: publisherId })
         .orderBy('ts', 'desc')
@@ -119,7 +126,7 @@ const getBookingsByPublisherId = async (
             true,
         )
         .modify(forServiceIds, relevantServiceIds)
-        .limit(pageSize ?? config.pagination.pageSize);
+        .limit(coalescedPageSize + 1);
 
     const countQuery = connection('bookings')
         .where({ publisher_id: publisherId })
@@ -128,11 +135,13 @@ const getBookingsByPublisherId = async (
 
     const totalCount = parseInt((await countQuery)[0].count as string, 10);
     const data = await query;
-    const parsedData = data.map(adaptBooking);
+
+    const returnedCount = data.length;
+    const parsedData = data.slice(0, coalescedPageSize).map(adaptBooking);
 
     return genPaginatedResponse(
         parsedData,
-        pageSize ?? config.pagination.pageSize,
+        returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Bookings,
         totalCount,
     );

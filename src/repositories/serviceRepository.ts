@@ -17,7 +17,6 @@ import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 import { createError } from '@errors/errorParser';
 import { BookingType, UniversityRole } from '@graphql/types';
-import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
 
@@ -52,6 +51,7 @@ const getServices = async (
     pageSize?: number,
     roles?: UniversityRole[],
 ): Promise<PaginatedServiceResponse> => {
+    const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('services')
         .orderBy('ts')
         .orderBy('id')
@@ -62,7 +62,7 @@ const getServices = async (
         )
         .modify(withQueryTerm, 'search_index', queryTerm)
         .modify(forRoles, isAdmin, roles)
-        .limit(pageSize ?? config.pagination.pageSize);
+        .limit(coalescedPageSize + 1);
 
     const countQuery = connection('services')
         .modify(withQueryTerm, 'search_index', queryTerm)
@@ -71,12 +71,13 @@ const getServices = async (
 
     const totalCount = parseInt((await countQuery)[0].count as string, 10);
     const data = await query;
+    const returnedCount = data.length;
 
-    const parsedData = data.map(adaptService);
+    const parsedData = data.slice(0, coalescedPageSize).map(adaptService);
 
     return genPaginatedResponse(
         parsedData,
-        pageSize ?? config.pagination.pageSize,
+        returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Services,
         totalCount,
     );
@@ -88,6 +89,7 @@ const getServicesByPublisherId = async (
     queryTerm?: string,
     pageSize?: number,
 ) => {
+    const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('services')
         .where({ publisher_id: userId })
         .orderBy('ts')
@@ -98,7 +100,7 @@ const getServicesByPublisherId = async (
             paginationToken,
         )
         .modify(withQueryTerm, 'search_index', queryTerm)
-        .limit(pageSize ?? config.pagination.pageSize);
+        .limit(coalescedPageSize + 1);
 
     const countQuery = connection('services')
         .where({ publisher_id: userId })
@@ -107,12 +109,14 @@ const getServicesByPublisherId = async (
 
     const totalCount = parseInt((await countQuery)[0].count as string, 10);
     const data = await query;
+    const returnedCount = data.length;
 
-    const parsedData = data.map(adaptService);
+    // We omit the last result, because we only use it to see if there's more data
+    const parsedData = data.slice(0, coalescedPageSize).map(adaptService);
 
     return genPaginatedResponse(
         parsedData,
-        pageSize ?? config.pagination.pageSize,
+        returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Services,
         totalCount,
     );
