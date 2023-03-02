@@ -57,6 +57,13 @@ const getBookingsByRequestorId = async (
         .modify(forServiceIds, relevantServiceIds)
         .limit(pageSize ?? config.pagination.pageSize);
 
+    const countQuery = connection('bookings')
+        .where({ requestor_id: requestorId })
+        .modify(forServiceIds, relevantServiceIds)
+        .count();
+
+    const totalCount = parseInt((await countQuery)[0].count as string, 10);
+
     const data = await query;
     const parsedData = data.map(adaptBooking);
 
@@ -64,6 +71,7 @@ const getBookingsByRequestorId = async (
         parsedData,
         pageSize ?? config.pagination.pageSize,
         PaginatedQueryType.Bookings,
+        totalCount,
     );
 };
 
@@ -79,6 +87,10 @@ const getBookings = async (paginationToken?: string, pageSize?: number) => {
         )
         .limit(pageSize ?? config.pagination.pageSize);
 
+    const countQuery = connection('bookings').count();
+
+    const totalCount = parseInt((await countQuery)[0].count as string, 10);
+
     const data = await query;
     const parsedData = data.map(adaptBooking);
 
@@ -86,6 +98,7 @@ const getBookings = async (paginationToken?: string, pageSize?: number) => {
         parsedData,
         pageSize ?? config.pagination.pageSize,
         PaginatedQueryType.Bookings,
+        totalCount,
     );
 };
 
@@ -108,6 +121,12 @@ const getBookingsByPublisherId = async (
         .modify(forServiceIds, relevantServiceIds)
         .limit(pageSize ?? config.pagination.pageSize);
 
+    const countQuery = connection('bookings')
+        .where({ publisher_id: publisherId })
+        .modify(forServiceIds, relevantServiceIds)
+        .count();
+
+    const totalCount = parseInt((await countQuery)[0].count as string, 10);
     const data = await query;
     const parsedData = data.map(adaptBooking);
 
@@ -115,6 +134,7 @@ const getBookingsByPublisherId = async (
         parsedData,
         pageSize ?? config.pagination.pageSize,
         PaginatedQueryType.Bookings,
+        totalCount,
     );
 };
 

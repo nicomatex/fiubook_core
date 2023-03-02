@@ -118,6 +118,7 @@ const genPaginatedResponse = <T extends PaginableDataType>(
     data: T[],
     last: number,
     dataType: PaginatedQueryType,
+    totalCount: number,
 ) => {
     const edges = data.map((item) => genEdge(item, dataType));
 
@@ -126,6 +127,7 @@ const genPaginatedResponse = <T extends PaginableDataType>(
         endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
         hasNextPage: data.length === last,
         hasPreviousPage: false,
+        totalCount,
     };
 
     return {

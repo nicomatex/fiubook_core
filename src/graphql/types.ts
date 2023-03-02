@@ -3,6 +3,7 @@ import {
     ClassType,
     Field,
     InputType,
+    Int,
     ObjectType,
     registerEnumType,
     ResolverData,
@@ -32,26 +33,29 @@ enum BookingStatus {
 @ObjectType()
 class PageInfo {
     @Field()
-    hasNextPage!: boolean;
+        hasNextPage!: boolean;
 
     @Field()
-    hasPreviousPage!: boolean;
+        hasPreviousPage!: boolean;
 
     @Field(() => String, { nullable: true })
-    startCursor?: string | null;
+        startCursor?: string | null;
 
     @Field(() => String, { nullable: true })
-    endCursor?: string | null;
+        endCursor?: string | null;
+
+    @Field(() => Int)
+        totalCount!: number;
 }
 
 function EdgesType<TItem>(itemFieldValue: ClassType<TItem>) {
     @ObjectType({ isAbstract: true })
     abstract class EdgesTypeClass {
         @Field(() => itemFieldValue)
-        node!: TItem;
+            node!: TItem;
 
         @Field()
-        cursor!: String;
+            cursor!: String;
     }
 
     return EdgesTypeClass;
@@ -82,11 +86,11 @@ type RoleChecker = ({
 class Credentials {
     @Field()
     @MaxLength(128)
-    dni!: string;
+        dni!: string;
 
     @Field()
     @MaxLength(128)
-    password!: string;
+        password!: string;
 }
 
 // Required to use these enums in Type-GraphQL.

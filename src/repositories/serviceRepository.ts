@@ -17,15 +17,15 @@ import { v4 as uuidv4 } from 'uuid';
 import adaptService from '@repositories/dataAdapters/serviceDataAdapter';
 import { createError } from '@errors/errorParser';
 import { BookingType, UniversityRole } from '@graphql/types';
+import logger from '@util/logger';
 
 const connection = knex({ ...config.knex });
 
-const DEFAULT_IMAGE_URL =
-    'https://via.placeholder.com/150/FFFFFF?text=Servicio';
+const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/150/FFFFFF?text=Servicio';
 
 const addService = async (
     creationArgs: CreateServiceArgs,
-    publisherId: string
+    publisherId: string,
 ): Promise<Service> => {
     const id = uuidv4();
 
@@ -50,7 +50,7 @@ const getServices = async (
     paginationToken?: string,
     queryTerm?: string,
     pageSize?: number,
-    roles?: UniversityRole[]
+    roles?: UniversityRole[],
 ): Promise<PaginatedServiceResponse> => {
     const query = connection('services')
         .orderBy('ts')
@@ -58,12 +58,18 @@ const getServices = async (
         .modify(
             withPaginationToken,
             PaginatedQueryType.Services,
-            paginationToken
+            paginationToken,
         )
         .modify(withQueryTerm, 'search_index', queryTerm)
         .modify(forRoles, isAdmin, roles)
         .limit(pageSize ?? config.pagination.pageSize);
 
+    const countQuery = connection('services')
+        .modify(withQueryTerm, 'search_index', queryTerm)
+        .modify(forRoles, isAdmin, roles)
+        .count();
+
+    const totalCount = parseInt((await countQuery)[0].count as string, 10);
     const data = await query;
 
     const parsedData = data.map(adaptService);
@@ -71,7 +77,8 @@ const getServices = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Services
+        PaginatedQueryType.Services,
+        totalCount,
     );
 };
 
@@ -88,11 +95,17 @@ const getServicesByPublisherId = async (
         .modify(
             withPaginationToken,
             PaginatedQueryType.Services,
-            paginationToken
+            paginationToken,
         )
         .modify(withQueryTerm, 'search_index', queryTerm)
         .limit(pageSize ?? config.pagination.pageSize);
 
+    const countQuery = connection('services')
+        .where({ publisher_id: userId })
+        .modify(withQueryTerm, 'search_index', queryTerm)
+        .count();
+
+    const totalCount = parseInt((await countQuery)[0].count as string, 10);
     const data = await query;
 
     const parsedData = data.map(adaptService);
@@ -100,7 +113,8 @@ const getServicesByPublisherId = async (
     return genPaginatedResponse(
         parsedData,
         pageSize ?? config.pagination.pageSize,
-        PaginatedQueryType.Services
+        PaginatedQueryType.Services,
+        totalCount,
     );
 };
 
@@ -108,8 +122,7 @@ const getServiceById = async (serviceId: string) => {
     const query = connection('services').where({ id: serviceId });
 
     const data = await query;
-    if (data.length === 0)
-        throw createError(404, `Service with id ${serviceId} not found`);
+    if (data.length === 0) throw createError(404, `Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -119,7 +132,7 @@ const getServiceById = async (serviceId: string) => {
 
 const updateServiceById = async (
     serviceId: string,
-    updateArgs: UpdateServiceArgs
+    updateArgs: UpdateServiceArgs,
 ) => {
     const query = connection('services')
         .where({ id: serviceId })
@@ -127,8 +140,7 @@ const updateServiceById = async (
         .returning('*');
 
     const data = await query;
-    if (data.length === 0)
-        throw createError(404, `Service with id ${serviceId} not found`);
+    if (data.length === 0) throw createError(404, `Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -143,8 +155,7 @@ const deleteServiceById = async (serviceId: string) => {
         .returning('*');
 
     const data = await query;
-    if (data.length === 0)
-        throw createError(404, `Service with id ${serviceId} not found`);
+    if (data.length === 0) throw createError(404, `Service with id ${serviceId} not found`);
     const service = data[0];
 
     const parsedService = adaptService(service);
@@ -155,7 +166,7 @@ const deleteServiceById = async (serviceId: string) => {
 const getServicesMetrics = async () => {
     const serviceCount = parseInt(
         (await connection('services').count())[0].count as string,
-        10
+        10,
     );
 
     const automaticConfirmationServicesCount = parseInt(
@@ -164,7 +175,7 @@ const getServicesMetrics = async () => {
                 .where({ booking_type: BookingType.AUTOMATIC })
                 .count()
         )[0].count as string,
-        10
+        10,
     );
 
     const manualConfirmationServicesCount = parseInt(
@@ -173,7 +184,7 @@ const getServicesMetrics = async () => {
                 .where({ booking_type: BookingType.REQUIRES_CONFIRMATION })
                 .count()
         )[0].count as string,
-        10
+        10,
     );
 
     return {

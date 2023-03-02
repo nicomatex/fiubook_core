@@ -1,4 +1,6 @@
-import { Field, ID, InputType, Int, ObjectType } from 'type-graphql';
+import {
+    Field, ID, InputType, Int, ObjectType,
+} from 'type-graphql';
 
 import {
     BookingType,
@@ -11,108 +13,108 @@ import { User } from '@graphql/schemas/user';
 @InputType()
 export class CreateServiceArgs {
     @Field(() => String)
-    name!: string;
+        name!: string;
 
     @Field(() => String)
-    description!: string;
+        description!: string;
 
     @Field(() => Int)
-    granularity!: number;
+        granularity!: number;
 
     @Field(() => Int, { nullable: true })
-    max_time?: number;
+        max_time?: number;
 
     @Field(() => BookingType)
-    booking_type!: BookingType;
+        booking_type!: BookingType;
 
     @Field(() => Boolean)
-    returnable!: boolean;
+        returnable!: boolean;
 
     @Field(() => [UniversityRole])
-    allowed_roles!: UniversityRole[];
+        allowed_roles!: UniversityRole[];
 
     @Field(() => [String])
-    tags!: string[];
+        tags!: string[];
 
     @Field(() => String, { nullable: true })
-    image_url?: string;
+        image_url?: string;
 }
 
 @InputType()
 export class UpdateServiceArgs {
     @Field(() => String, { nullable: true })
-    name?: string;
+        name?: string;
 
     @Field(() => String, { nullable: true })
-    description?: string;
+        description?: string;
 
     @Field(() => Int, { nullable: true })
-    granularity?: number;
+        granularity?: number;
 
     @Field(() => Int, { nullable: true })
-    max_time?: number;
+        max_time?: number;
 
     @Field(() => Boolean, { nullable: true })
-    returnable?: boolean;
+        returnable?: boolean;
 
     @Field(() => BookingType, { nullable: true })
-    booking_type?: BookingType;
+        booking_type?: BookingType;
 
     @Field(() => [UniversityRole], { nullable: true })
-    allowed_roles?: UniversityRole[];
+        allowed_roles?: UniversityRole[];
 
     @Field(() => [String], { nullable: true })
-    tags?: string[];
+        tags?: string[];
 
     @Field(() => String, { nullable: true })
-    image_url?: string;
+        image_url?: string;
 }
 
 @ObjectType()
 class Service {
     @Field()
-    ts!: Date;
+        ts!: Date;
 
     @Field(() => ID)
-    id!: string;
+        id!: string;
 
     @Field(() => ID)
-    publisher_id!: string;
+        publisher_id!: string;
 
     @Field(() => String)
-    name!: string;
+        name!: string;
 
     @Field(() => String)
-    description!: string;
+        description!: string;
 
     @Field(() => [String])
-    tags!: string[];
+        tags!: string[];
 
     @Field(() => String)
-    image_url!: string;
+        image_url!: string;
 
     @Field(() => Int, { description: 'Time slot granularity in seconds' })
-    granularity!: number;
+        granularity!: number;
 
     @Field(() => Int, {
         description: 'Maximum amount of time slots to reserve',
     })
-    max_time!: number;
+        max_time!: number;
 
     @Field(() => Boolean, {
         description:
             'If the service consists of a material object, it must be returnable',
     })
-    returnable!: boolean;
+        returnable!: boolean;
 
     @Field(() => BookingType)
-    booking_type!: BookingType;
+        booking_type!: BookingType;
 
     @Field(() => [UniversityRole])
-    allowed_roles!: UniversityRole[];
+        allowed_roles!: UniversityRole[];
 
     @Field(() => User, { nullable: true })
-    publisher?: User | null;
+        publisher?: User | null;
 }
 
 @ObjectType()
@@ -121,10 +123,10 @@ class ServicesEdgesType extends EdgesType(Service) {}
 @ObjectType()
 class PaginatedServiceResponse {
     @Field(() => [ServicesEdgesType])
-    edges!: ServicesEdgesType[];
+        edges!: ServicesEdgesType[];
 
     @Field(() => PageInfo)
-    pageInfo!: PageInfo;
+        pageInfo!: PageInfo;
 }
 
 export { Service, PaginatedServiceResponse };
