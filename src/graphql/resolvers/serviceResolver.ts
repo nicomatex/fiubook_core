@@ -7,7 +7,6 @@ import {
 } from '@graphql/schemas/service';
 import {
     Arg,
-    Args,
     Authorized,
     Ctx,
     FieldResolver,
@@ -81,6 +80,7 @@ class ServiceResolver {
         const res = await serviceRepository.getServicesByPublisherId(
             ctx.userId,
             paginationToken,
+            queryTerm,
             pageSize,
         );
         return res;

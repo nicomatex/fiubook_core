@@ -76,6 +76,14 @@ const withPaginationToken = (
     );
 };
 
+const forServiceIds = (
+    queryBuilder: Knex.QueryBuilder,
+    serviceIds: string[] | null,
+) => {
+    if (serviceIds === null) return;
+    queryBuilder.whereIn('service_id', serviceIds);
+};
+
 const forRoles = (
     queryBuilder: Knex.QueryBuilder,
     isAdmin: boolean,
@@ -135,4 +143,5 @@ export {
     withQueryTerm,
     genPaginatedResponse,
     forRoles,
+    forServiceIds,
 };
