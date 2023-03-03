@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS users(
     can_publish_services BOOLEAN NOT NULL,
     is_admin BOOLEAN NOT NULL,
     is_banned BOOLEAN NOT NULL DEFAULT false
+    name VARCHAR(64),
+    lastname VARCHAR(64),
+    email VARCHAR(320)
 );
 
 -- Index on timestamp used for pagination
