@@ -41,7 +41,7 @@ const decodeSessionToken = (token: string): LoggedInContextType => {
     };
 };
 
-// TODO: unmock this implementation
+// TODO: unmock this implementation and integrate with FIUBA authentication mechanism
 const checkFIUBACredentials = async (
     dni: string,
     password: string,

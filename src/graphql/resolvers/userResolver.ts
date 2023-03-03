@@ -19,6 +19,25 @@ import userRepository from '@repositories/userRepository';
 import CheckFiubaCredentialsGuard from '@graphql/middlewares/checkFIUBACredentialsMiddleware';
 import { Credentials, LoggedInContextType } from '@graphql/types';
 import { createError } from '@errors/errorParser';
+import constants from '../../constants';
+import { validateAttributeLimits } from '@util/validationUtil';
+
+const validateUserArgs = (userAttributes: {
+    name?: string;
+    lastname?: string;
+    email?: string;
+}) => {
+    return validateAttributeLimits(
+        'User',
+        userAttributes,
+        constants.userLimits,
+        [
+            { attr: 'name', limit: 'maxNameLength' },
+            { attr: 'lastname', limit: 'maxLastnameLength' },
+            { attr: 'email', limit: 'maxEmailLength' },
+        ]
+    );
+};
 
 @Resolver()
 class UserResolver {
@@ -26,7 +45,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async user(
         @Arg('id', { nullable: true }) id?: string,
-        @Arg('dni', { nullable: true }) dni?: string,
+        @Arg('dni', { nullable: true }) dni?: string
     ) {
         if (dni !== undefined) {
             const res = await userRepository.getUserByDNI(dni);
@@ -43,7 +62,7 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async users(
         @Arg('after', { nullable: true }) paginationToken?: string,
-        @Arg('first', { nullable: true }) pageSize?: number,
+        @Arg('first', { nullable: true }) pageSize?: number
     ) {
         const res = await userRepository.getUsers(paginationToken, pageSize);
         return res;
@@ -67,8 +86,9 @@ class UserResolver {
     @Authorized(['ADMIN'])
     async updateUser(
         @Arg('id') id: string,
-        @Arg('update_args') updateArgs: UpdateUserArgs,
+        @Arg('update_args') updateArgs: UpdateUserArgs
     ) {
+        validateUserArgs(updateArgs);
         const res = await userRepository.updateUserById(id, updateArgs);
         return res;
     }

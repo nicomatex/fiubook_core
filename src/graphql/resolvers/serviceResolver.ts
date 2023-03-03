@@ -20,6 +20,7 @@ import { LoggedInContextType } from '@graphql/types';
 import userRepository from '@repositories/userRepository';
 import { createError } from '@errors/errorParser';
 import constants from '../../constants';
+import { validateAttributeLimits } from '@util/validationUtil';
 
 const validateServiceArgs = (serviceAttributes: {
     name?: string;
@@ -27,24 +28,17 @@ const validateServiceArgs = (serviceAttributes: {
     tags?: string[];
     image_url?: string;
 }) => {
-    [
-        { attr: 'name', limit: 'maxNameLength' },
-        { attr: 'description', limit: 'maxDescriptionLength' },
-        { attr: 'tags', limit: 'maxTags' },
-        { attr: 'image_url', limit: 'maxImageUrlLength' },
-    ].forEach(({ attr, limit }) => {
-        const currentAttrLength = (serviceAttributes as any)[attr]?.length;
-        if (!currentAttrLength) return;
-
-        const attrMaxLength = (constants.serviceLimits as any)[limit];
-
-        if (currentAttrLength >= attrMaxLength) {
-            throw createError(
-                400,
-                `Service ${attr} length must be lower than ${attrMaxLength} (current ${currentAttrLength})`
-            );
-        }
-    });
+    validateAttributeLimits(
+        'Service',
+        serviceAttributes,
+        constants.serviceLimits,
+        [
+            { attr: 'name', limit: 'maxNameLength' },
+            { attr: 'description', limit: 'maxDescriptionLength' },
+            { attr: 'tags', limit: 'maxTags' },
+            { attr: 'image_url', limit: 'maxImageUrlLength' },
+        ]
+    );
 
     serviceAttributes.tags?.forEach((tag) => {
         if (tag.length > constants.serviceLimits.maxTagLength) {
