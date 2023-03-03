@@ -19,19 +19,29 @@ const connection = knex({ ...config.knex });
 const getConflictingBookings = async (
     serviceId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
 ) => {
+    // hack to allow consecutive bookings, since ranges are inclusive
+    const exclusiveStartDate = new Date(startDate.getTime() + 1);
+    const exclusiveEndDate = new Date(endDate.getTime() - 1);
+
     const query = connection('bookings')
         .where({ service_id: serviceId })
         .whereNot({ booking_status: BookingStatus.CANCELLED })
         .andWhere((connection) => {
             connection
-                .whereBetween('start_date', [startDate, endDate])
-                .orWhereBetween('end_date', [startDate, endDate])
+                .whereBetween('start_date', [
+                    exclusiveStartDate,
+                    exclusiveEndDate,
+                ])
+                .orWhereBetween('end_date', [
+                    exclusiveStartDate,
+                    exclusiveEndDate,
+                ])
                 .orWhere((connection) => {
                     connection
-                        .where('start_date', '<', startDate)
-                        .andWhere('end_date', '>', endDate);
+                        .where('start_date', '<', exclusiveStartDate)
+                        .andWhere('end_date', '>', exclusiveEndDate);
                 });
         });
     const res = await query;
@@ -42,7 +52,7 @@ const getBookingsByRequestorId = async (
     requestorId: string,
     relevantServiceIds: string[] | null,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('bookings')
@@ -53,7 +63,7 @@ const getBookingsByRequestorId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .modify(forServiceIds, relevantServiceIds)
         .limit(coalescedPageSize + 1);
@@ -74,7 +84,7 @@ const getBookingsByRequestorId = async (
         parsedData,
         returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Bookings,
-        totalCount,
+        totalCount
     );
 };
 
@@ -87,7 +97,7 @@ const getBookings = async (paginationToken?: string, pageSize?: number) => {
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .limit(coalescedPageSize + 1);
 
@@ -104,7 +114,7 @@ const getBookings = async (paginationToken?: string, pageSize?: number) => {
         parsedData,
         returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Bookings,
-        totalCount,
+        totalCount
     );
 };
 
@@ -112,7 +122,7 @@ const getBookingsByPublisherId = async (
     publisherId: string,
     relevantServiceIds: string[] | null,
     paginationToken?: string,
-    pageSize?: number,
+    pageSize?: number
 ) => {
     const coalescedPageSize = pageSize ?? config.pagination.pageSize;
     const query = connection('bookings')
@@ -123,7 +133,7 @@ const getBookingsByPublisherId = async (
             withPaginationToken,
             PaginatedQueryType.Bookings,
             paginationToken,
-            true,
+            true
         )
         .modify(forServiceIds, relevantServiceIds)
         .limit(coalescedPageSize + 1);
@@ -143,18 +153,19 @@ const getBookingsByPublisherId = async (
         parsedData,
         returnedCount === coalescedPageSize + 1,
         PaginatedQueryType.Bookings,
-        totalCount,
+        totalCount
     );
 };
 
 const createBooking = async (
     creationArgs: CreateBookingArgs,
     requestedService: Service,
-    requestorId: string,
+    requestorId: string
 ) => {
-    const bookingStatus = requestedService.booking_type === 'AUTOMATIC'
-        ? BookingStatus.CONFIRMED
-        : BookingStatus.PENDING_CONFIRMATION;
+    const bookingStatus =
+        requestedService.booking_type === 'AUTOMATIC'
+            ? BookingStatus.CONFIRMED
+            : BookingStatus.PENDING_CONFIRMATION;
 
     const newBooking = {
         ...creationArgs,
@@ -171,7 +182,7 @@ const createBooking = async (
     const insertedBooking = insertionResult[0];
     const bookingEdge: BookingEdgesType = genEdge(
         insertedBooking,
-        PaginatedQueryType.Bookings,
+        PaginatedQueryType.Bookings
     );
     return bookingEdge;
 };
@@ -180,7 +191,8 @@ const getBookingById = async (id: string) => {
     const query = connection('bookings').where({ id });
 
     const data = await query;
-    if (data.length === 0) throw createError(404, `Booking with id ${id} not found`);
+    if (data.length === 0)
+        throw createError(404, `Booking with id ${id} not found`);
     const booking = data[0];
 
     const parsedBooking = adaptBooking(booking);
@@ -196,14 +208,15 @@ const deleteBookingById = async (id: string) => {
 
 const updateBookingStatusById = async (
     id: string,
-    newStatus: BookingStatus,
+    newStatus: BookingStatus
 ) => {
     const query = connection('bookings')
         .where({ id })
         .update({ booking_status: newStatus })
         .returning('*');
     const data = await query;
-    if (data.length === 0) throw createError(404, `Booking with id ${id} not found`);
+    if (data.length === 0)
+        throw createError(404, `Booking with id ${id} not found`);
 
     const modifiedBooking = data[0];
 
@@ -214,7 +227,7 @@ const updateBookingStatusById = async (
 const getBookingsMetrics = async () => {
     const bookingCount = parseInt(
         (await connection('bookings').count())[0].count as string,
-        10,
+        10
     );
 
     const pendingBookingsCount = parseInt(
@@ -223,7 +236,7 @@ const getBookingsMetrics = async () => {
                 .where({ booking_status: BookingStatus.PENDING_CONFIRMATION })
                 .count()
         )[0].count as string,
-        10,
+        10
     );
 
     const confirmedBookingsCount = parseInt(
@@ -232,7 +245,7 @@ const getBookingsMetrics = async () => {
                 .where({ booking_status: BookingStatus.CONFIRMED })
                 .count()
         )[0].count as string,
-        10,
+        10
     );
 
     const cancelledBookingsCount = parseInt(
@@ -241,7 +254,7 @@ const getBookingsMetrics = async () => {
                 .where({ booking_status: BookingStatus.CANCELLED })
                 .count()
         )[0].count as string,
-        10,
+        10
     );
 
     return {
