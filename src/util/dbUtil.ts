@@ -13,6 +13,7 @@ enum PaginatedQueryType {
     Users,
     Services,
     Bookings,
+    Notifications,
 }
 
 type PaginationTokenPayload = {

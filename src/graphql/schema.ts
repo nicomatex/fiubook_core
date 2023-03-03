@@ -5,6 +5,7 @@ import SessionResolver from '@graphql/resolvers/sessionResolver';
 import ServiceResolver from '@graphql/resolvers/serviceResolver';
 import BookingResolver from '@graphql/resolvers/bookingResolver';
 import MetricsResolver from '@graphql/resolvers/metricsResolver';
+import NotificationResolver from '@graphql/resolvers/notificationResolver';
 
 const schema = buildSchema({
     resolvers: [
@@ -13,6 +14,7 @@ const schema = buildSchema({
         ServiceResolver,
         BookingResolver,
         MetricsResolver,
+        NotificationResolver,
     ],
     authChecker,
 });
