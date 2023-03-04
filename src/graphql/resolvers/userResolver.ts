@@ -12,6 +12,7 @@ import {
 
 import {
     PaginatedUserResponse,
+    UpdateProfileArgs,
     UpdateUserArgs,
     User,
 } from '@graphql/schemas/user';
@@ -80,6 +81,17 @@ class UserResolver {
             }
             throw err;
         }
+    }
+
+    @Mutation(() => User)
+    @Authorized()
+    async updateProfile(
+        @Ctx() ctx: LoggedInContextType,
+        @Arg('update_args') updateArgs: UpdateProfileArgs
+    ) {
+        validateUserArgs(updateArgs);
+        const res = await userRepository.updateUserById(ctx.userId, updateArgs);
+        return res;
     }
 
     @Mutation(() => User)

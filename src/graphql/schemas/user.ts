@@ -26,6 +26,18 @@ export class UpdateUserArgs {
     email?: string;
 }
 
+@InputType()
+export class UpdateProfileArgs {
+    @Field(() => String, { nullable: true })
+    name?: string;
+
+    @Field(() => String, { nullable: true })
+    lastname?: string;
+
+    @Field(() => String, { nullable: true })
+    email?: string;
+}
+
 @ObjectType()
 class User {
     @Field(() => ID)
