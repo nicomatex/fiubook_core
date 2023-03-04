@@ -56,9 +56,9 @@ CREATE INDEX ts_idx_bookings ON bookings USING btree (ts);
 CREATE TABLE IF NOT EXISTS notifications(
     id CHAR(36) PRIMARY KEY,
     ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
-    receiver_id CHAR(36) REFERENCES users(id),
+    receiver_id CHAR(36) REFERENCES users(id) ON DELETE CASCADE,
     type NOTIFICATION_TYPE NOT NULL,
-    booking_id CHAR(36) REFERENCES bookings(id),
+    booking_id CHAR(36) REFERENCES bookings(id) ON DELETE CASCADE,
     read BOOLEAN NOT NULL DEFAULT false
 );
 
