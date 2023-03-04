@@ -24,4 +24,20 @@ CREATE INDEX ts_idx_notifications ON notifications USING btree (ts);
 ALTER TABLE users ADD COLUMN name VARCHAR(64);
 ALTER TABLE users ADD COLUMN lastname VARCHAR(64);
 ALTER TABLE users ADD COLUMN email VARCHAR(320);
+<<<<<<< HEAD
 >>>>>>> ab8d83b (Add profile fields: email, name and lastname (#52))
+=======
+-- notifications migration
+CREATE TYPE NOTIFICATION_TYPE AS ENUM('NEW_BOOKING_REQUEST','BOOKING_REQUEST_ACCEPTED','BOOKING_REQUEST_REJECTED','BOOKING_CANCELLED','BOOKING_REQUEST_CANCELLED', 'OBJECT_DELIVERED', 'OBJECT_RETURNED');
+
+CREATE TABLE IF NOT EXISTS notifications(
+    id CHAR(36) PRIMARY KEY,
+    ts TIMESTAMPTZ (2) DEFAULT current_timestamp,
+    receiver_id CHAR(36) REFERENCES users(id),
+    type NOTIFICATION_TYPE NOT NULL,
+    booking_id CHAR(36) REFERENCES bookings(id),
+    read BOOLEAN NOT NULL DEFAULT false
+);
+
+CREATE INDEX ts_idx_notifications ON notifications USING btree (ts);
+>>>>>>> c46fd0a (Adds full notification support)
