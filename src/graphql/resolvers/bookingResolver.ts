@@ -9,7 +9,11 @@ import {
     Resolver,
     Root,
 } from 'type-graphql';
-import { BookingStatus, LoggedInContextType } from '@graphql/types';
+import {
+    BookingStatus,
+    LoggedInContextType,
+    NotificationType,
+} from '@graphql/types';
 import {
     Booking,
     BookingEdgesType,
@@ -23,6 +27,7 @@ import userRepository from '@repositories/userRepository';
 import { User } from '@graphql/schemas/user';
 import { Service } from '@graphql/schemas/service';
 import { createError } from '@errors/errorParser';
+import notificationRepository from '@repositories/notificationRepository';
 
 const validateBookingDateLimits = ({
     start_date: startDate,
@@ -105,6 +110,23 @@ class BookingResolver {
             ctx.userId,
         );
 
+        // TODO: this shouldn't happen syncronically
+        await notificationRepository.createNotification(
+            requestedService.publisher_id,
+            insertedBookingEdge.node.id,
+            NotificationType.NEW_BOOKING_REQUEST,
+        );
+
+        if (
+            insertedBookingEdge.node.booking_status === BookingStatus.CONFIRMED
+        ) {
+            await notificationRepository.createNotification(
+                ctx.userId,
+                insertedBookingEdge.node.id,
+                NotificationType.BOOKING_REQUEST_ACCEPTED,
+            );
+        }
+
         return { bookingEdge: insertedBookingEdge };
     }
 
@@ -182,6 +204,18 @@ class BookingResolver {
             bookingId,
             BookingStatus.CANCELLED,
         );
+
+        // TODO: this would be better if it didn't happen syncronically
+        await notificationRepository.createNotification(
+            booking.publisher_id,
+            bookingId,
+            NotificationType.BOOKING_REQUEST_CANCELLED,
+        );
+        await notificationRepository.createNotification(
+            booking.requestor_id,
+            bookingId,
+            NotificationType.BOOKING_CANCELLED,
+        );
         return res;
     }
 
@@ -239,6 +273,14 @@ class BookingResolver {
             accept ? BookingStatus.CONFIRMED : BookingStatus.CANCELLED,
         );
 
+        await notificationRepository.createNotification(
+            booking.requestor_id,
+            bookingId,
+            accept
+                ? NotificationType.BOOKING_REQUEST_ACCEPTED
+                : NotificationType.BOOKING_REQUEST_REJECTED,
+        );
+
         return res;
     }
 
@@ -274,7 +316,11 @@ class BookingResolver {
             bookingId,
             BookingStatus.PENDING_RETURN,
         );
-
+        await notificationRepository.createNotification(
+            booking.requestor_id,
+            bookingId,
+            NotificationType.OBJECT_DELIVERED,
+        );
         return res;
     }
 
@@ -299,6 +345,12 @@ class BookingResolver {
         const res = await bookingRepository.updateBookingStatusById(
             bookingId,
             BookingStatus.RETURNED,
+        );
+
+        await notificationRepository.createNotification(
+            booking.requestor_id,
+            bookingId,
+            NotificationType.OBJECT_RETURNED,
         );
 
         return res;

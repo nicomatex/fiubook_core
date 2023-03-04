@@ -30,6 +30,16 @@ enum BookingStatus {
     RETURNED = 'RETURNED',
 }
 
+enum NotificationType {
+    NEW_BOOKING_REQUEST = 'NEW_BOOKING_REQUEST',
+    BOOKING_REQUEST_ACCEPTED = 'BOOKING_REQUEST_ACCEPTED',
+    BOOKING_REQUEST_REJECTED = 'BOOKING_REQUEST_REJECTED',
+    BOOKING_CANCELLED = 'BOOKING_CANCELLED',
+    BOOKING_REQUEST_CANCELLED = 'BOOKING_REQUEST_CANCELLED',
+    OBJECT_RETURNED = 'OBJECT_RETURNED',
+    OBJECT_DELIVERED = 'OBJECT_DELIVERED',
+}
+
 @ObjectType()
 class PageInfo {
     @Field()
@@ -111,6 +121,12 @@ registerEnumType(BookingStatus, {
         'Booking Status. CONFIRMED, PENDING_CONFIRMATION, CANCELLED, PENDING_RETURN or RETURNED',
 });
 
+registerEnumType(NotificationType, {
+    name: 'NotificationType',
+    description:
+        'Notification Type. NEW_BOOKING_REQUEST, BOOKING_REQUEST_ACCEPTED, BOOKING_REQUEST_REJECTED, BOOKING_CANCELLED or BOOKING_REQUEST_CANCELLED',
+});
+
 export {
     PageInfo,
     EdgesType,
@@ -123,4 +139,5 @@ export {
     BookingType,
     UniversityRole,
     BookingStatus,
+    NotificationType,
 };
